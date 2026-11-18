@@ -15,7 +15,7 @@ Exo's HyperFrames home: the Exo block registry, brand files, a project template,
 | `brand/` | Brand files every project gets: Google Sans (OFL) and the Exo orb + icons. |
 | `templates/exo-film/` | Starting `index.html` for a new project (Exo ground/ink tokens, fonts, GSAP). |
 | `scripts/` | `new-project.mjs` (create a correctly named project), `sync-brand.mjs` (restore brand files after a clone). |
-| `YYYY-MM-DD__campaign__piece/` | Projects, at the repo root. |
+| `YYYY-MM-DD__campaign__piece/` | Projects, at the repo root, **not committed** (see below). |
 
 ## Naming projects
 
@@ -58,7 +58,7 @@ To use a HeyGen registry block in an Exo project, set `registry` in that project
 
 ## What is not in git
 
-This repo is public. Renders, caches and per-project font copies are ignored; run `node scripts/sync-brand.mjs` after cloning to put the fonts back. Licensed or third-party media (music beds, stock or client photos, footage) goes in a project's `assets/local/`, which is ignored, and stays on the machine or in Exo's media storage.
+This repo is public. **Projects are not committed**: they hold agent run traces, drafts, licensed media and local paths. They live in this folder on the machine (Launch Studio and the HyperFrames app read them here); version them in a private repo if needed. Inside the repo, renders, caches and per-project font copies are ignored; run `node scripts/sync-brand.mjs` after cloning to put the fonts back. Licensed or third-party media (music beds, stock or client photos, footage) goes in a project's `assets/local/`, which is ignored, and stays on the machine or in Exo's media storage.
 
 ## Rendering
 

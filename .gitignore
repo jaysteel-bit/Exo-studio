@@ -1,3 +1,8 @@
+# Projects (YYYY-MM-DD__campaign__piece) are working folders, not part of this
+# public repo: they carry agent traces, drafts, licensed media and local paths.
+# Keep them on the machine (and in a private repo or Exo media storage if needed).
+/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]__*/
+
 # HyperFrames output and caches, per project
 */renders/
 */.thumbnails/
