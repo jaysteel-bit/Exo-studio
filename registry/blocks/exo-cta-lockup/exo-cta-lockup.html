@@ -1,0 +1,358 @@
+<template>
+<style>
+@font-face { font-family: "Google Sans"; src: url("assets/fonts/GoogleSans.ttf") format("truetype"); font-weight: 100 900; }
+#root {
+  --bg: #EFEFE9;          
+  --bg-final: #F5F5F0;    
+  --line: #D7D7D7;        
+  --perimeter: #CFCFCF;   
+  --ring-line: #DADADA;   
+  --disc-line: #E0E0E0;   
+  --connector-line: #CECECE;
+  --horn-line: #D4D4D4;   
+  --accent: #070906;      
+  --accent-2: #D8D8D2;    
+  --link-on: #10B981;     
+  --link-off: #5C605E;    
+  --link-fade-1: #2E8E6C; 
+  --link-fade-2: #4A7466; 
+  --link-wake-1: #3F7F69; 
+  --link-wake-2: #22A27A; 
+  --muted: #D3D3CD;       
+  --dots: #BFC3C2;        
+  --flame-dots: #2F3031;  
+  --ink: #070906;         
+  --shadow: #000000;
+  --font-ui: "Google Sans", sans-serif;
+}
+:where(#c-stage) * { margin: 0; padding: 0; box-sizing: border-box; }
+#root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-final); }
+#c-stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; overflow: hidden; transform: scale(1.5); transform-origin: 0 0; }
+:where(#c-stage) .abs { position: absolute; left: 0; top: 0; }
+:where(#c-stage) svg { overflow: visible; display: block; }
+#c-world { width: 1280px; height: 720px; }
+#c-paper { left: -1300px; width: 3000px; height: 720px; background: var(--bg); }
+:where(#c-stage) .rule-v { width: 0.8px; height: 720px; background: var(--line); }
+:where(#c-stage) .rule-h { height: 0.8px; background: var(--line); }
+#c-perimeter { left: 0.5px; top: 0.5px; width: 1279px; height: 719px; border: 1px solid var(--perimeter); border-radius: 12px; }
+#c-enter { position: absolute; inset: 0; }
+#c-apply { left: 0; top: 446px; width: 1280px; display: flex; justify-content: center; }
+#c-apply-in { padding: 15px 30px; border-radius: 9999px; background: var(--ink); color: var(--bg-final); font: 500 22px/26px var(--font-ui); letter-spacing: 0.005em; opacity: 0; }
+:where(#c-stage) .junction { width: 20px; height: 20px; fill: var(--line); }
+#c-dots { top: 480px; width: 1280px; height: 240px; }
+:where(#c-stage) .crosses { opacity: 0.48; }
+:where(#c-stage) .crosses path { fill: none; stroke: var(--dots); stroke-width: 0.7; }
+:where(#c-stage) .blabel { left: -170px; top: 132px; width: 340px; text-align: center; font: 500 21px/28px var(--font-ui); color: #2F3031; letter-spacing: -0.01em; }
+:where(#c-stage) .ring { width: 236px; height: 236px; margin: -118px 0 0 -118px; border-radius: 50%; background: var(--bg); border: 0.8px solid var(--ring-line); }
+:where(#c-stage) .disc { width: 176px; height: 176px; margin: -88px 0 0 -88px; border-radius: 50%; background: var(--bg-final); border: 0.8px solid var(--disc-line);
+  box-shadow: 0 12px 16px color-mix(in srgb, var(--shadow) 14%, transparent); }
+#c-openai-disc { box-shadow: 0 12px 16px color-mix(in srgb, var(--shadow) 11%, transparent); }
+:where(#c-stage) .ink { overflow: hidden; mix-blend-mode: multiply; }
+:where(#c-stage) .ink img { position: absolute; width: 125%; height: 125%; left: -12.5%; top: -12.5%; }
+#c-openai-ink { width: 86px; height: 86px; margin: -43px 0 0 -43px; }
+#c-gemini-ink { width: 101px; height: 101px; margin: -50.5px 0 0 -50.5px; }
+#c-prev-mark { width: 90px; height: 70px; margin: -40px 0 0 -45px; fill: var(--muted); }
+#c-badge-flame { left: 496px; top: 325px; width: 70px; height: 70px; transform-origin: 50% 100%; background: center / 100% 100% no-repeat; }
+#c-connector-disc { left: 319px; top: 325px; width: 72px; height: 72px; border-radius: 50%; background: var(--bg); border: 0.8px solid var(--connector-line); }
+#c-connector svg path { fill: none; stroke-width: 2.5; }
+#c-link-open { left: 334px; top: 349px; width: 42px; height: 23px; }
+#c-link-open path { stroke: var(--link-off); }
+#c-link-closed { left: 339px; top: 350px; width: 32px; height: 20px; opacity: 0; }
+#c-link-closed path { stroke: var(--link-on); }
+#c-horn { width: 2400px; height: 720px; }
+#c-horn-w { fill: var(--bg-final); stroke: var(--horn-line); stroke-width: 0.65; }
+#c-horn-o { fill: var(--accent); }
+#c-horn-g { fill: var(--accent-2); }
+#c-lockup { left: var(--lockup-cx, 642.5px); top: 282px; display: flex; align-items: flex-start; transform: translateX(-50%); visibility: hidden; }
+#c-flame { position: relative; width: 130px; height: 130px; flex: none; }
+#c-flame-grid { position: absolute; inset: 0;
+  mask-image: repeating-linear-gradient(90deg, var(--shadow) 0 4px, transparent 4px 6px); }
+#c-flame-grid-y, #c-flame-solid { --v: 0; clip-path: inset(calc((1 - var(--v)) * 100%) 0 0 0); }
+#c-flame-grid-y { position: absolute; inset: 0;
+  mask-image: repeating-linear-gradient(180deg, var(--shadow) 0 4px, transparent 4px 6px); }
+#c-flame-dots { position: absolute; inset: 0; background: var(--flame-dots); transform-origin: 50% 100%;
+  mask-size: 100% 100%; -webkit-mask-size: 100% 100%; }
+#c-flame-solid { position: absolute; inset: 0; }
+#c-flame-solid img { display: block; width: 130px; height: 130px; transform-origin: 50% 100%; }
+#c-wordmark { margin: 0 0 0 26px; display: inline-block; white-space: pre; font-family: var(--font-ui); font-size: 116px; font-weight: 500;
+  line-height: 130px; letter-spacing: -2px; color: var(--ink); mask-repeat: no-repeat; -webkit-mask-repeat: no-repeat; }
+</style>
+<div data-hf-id="hf-8p5n" id="root" data-composition-id="cta" data-width="1920" data-height="1080">
+<div data-hf-id="hf-fyzx" id="c-enter">
+<div data-hf-id="hf-exbx" id="c-stage">
+  <div data-hf-id="hf-whuf" id="c-ground" class="abs" style="width:1280px;height:720px"></div>
+
+  <div data-hf-id="hf-zz1u" id="c-world" class="abs">
+    <!-- background grid, dot field, crosses, perimeter -->
+    <div data-hf-id="hf-5218" id="c-paper" class="abs"></div>
+    <div data-hf-id="hf-xzdl" class="abs rule-v" style="left:355px"></div>
+    <div data-hf-id="hf-p1zz" class="abs rule-v" style="left:708px"></div>
+    <div data-hf-id="hf-9jo8" class="abs rule-v" style="left:1010px"></div>
+    <div data-hf-id="hf-ao83" class="abs rule-h" style="left:355px;top:184px;width:1500px"></div>
+    <div data-hf-id="hf-i3ui" class="abs rule-h" style="left:355px;top:536px;width:1500px"></div>
+    <canvas data-hf-id="hf-bznj" id="c-dots" class="abs" width="1280" height="240"></canvas>
+    <svg data-hf-id="hf-u4zb" class="abs crosses" style="top:535px" width="240" height="180"><path data-hf-id="hf-bbc6" /></svg>
+    <svg data-hf-id="hf-8ghp" class="abs crosses" style="top:559px" width="240" height="180"><path data-hf-id="hf-0tka" /></svg>
+    <svg data-hf-id="hf-ibhz" class="abs crosses" style="top:535px" width="240" height="180"><path data-hf-id="hf-17vb" /></svg>
+    <div data-hf-id="hf-js77" id="c-perimeter" class="abs"></div>
+    <svg data-hf-id="hf-e2qn" class="abs junction" style="left:345px;top:174px" viewBox="0 0 20 20"><path data-hf-id="hf-1anc" d="M10 0 Q10 10 20 10 Q10 10 10 20 Q10 10 0 10 Q10 10 10 0Z" /></svg>
+    <svg data-hf-id="hf-l46u" class="abs junction" style="left:345px;top:526px" viewBox="0 0 20 20"><path data-hf-id="hf-r868" d="M10 0 Q10 10 20 10 Q10 10 10 20 Q10 10 0 10 Q10 10 10 0Z" /></svg>
+    <svg data-hf-id="hf-1018" class="abs junction" style="left:698px;top:174px" viewBox="0 0 20 20"><path data-hf-id="hf-q195" d="M10 0 Q10 10 20 10 Q10 10 10 20 Q10 10 0 10 Q10 10 10 0Z" /></svg>
+    <svg data-hf-id="hf-w4hx" class="abs junction" style="left:698px;top:526px" viewBox="0 0 20 20"><path data-hf-id="hf-qfk6" d="M10 0 Q10 10 20 10 Q10 10 10 20 Q10 10 0 10 Q10 10 10 0Z" /></svg>
+
+    <!-- AI badge carousel: previous (top, pale) / from (OpenAI) / to (Gemini); holders are the disc centres -->
+    <div data-hf-id="hf-uwbd" id="c-openai" class="abs" style="left:170px">
+      <div data-hf-id="hf-4azi" class="abs ring"></div>
+      <div data-hf-id="hf-07t3" id="c-openai-disc" class="abs disc"></div>
+      <div data-hf-id="hf-yo3v" class="abs blabel">A goal to build</div>
+      <div data-hf-id="hf-ff1n" id="c-openai-ink" class="abs ink"><img data-hf-id="hf-24q1" data-slot="provider-from-icon" src="assets/brand/icon-goal.svg" alt="" /></div>
+    </div>
+    <div data-hf-id="hf-wpiw" id="c-gemini" class="abs" style="left:170px">
+      <div data-hf-id="hf-dy0y" class="abs ring"></div>
+      <div data-hf-id="hf-ol2b" id="c-gemini-disc" class="abs disc" style="opacity:0"></div>
+      <div data-hf-id="hf-c24b" class="abs blabel">An experience to shape</div>
+      <div data-hf-id="hf-osu6" id="c-gemini-ink" class="abs ink" style="opacity:0.18"><img data-hf-id="hf-jbi7" data-slot="provider-to-icon" src="assets/brand/icon-experience.svg" alt="" /></div>
+    </div>
+    <div data-hf-id="hf-fyt2" id="c-prev" class="abs" style="left:170px">
+      <div data-hf-id="hf-ecbz" class="abs ring"></div>
+      <svg data-hf-id="hf-fvuo" id="c-prev-mark" class="abs" data-slot="provider-prev-mark" viewBox="0 0 90 70"><path data-hf-id="hf-cq6k" d="M45 0 C48 26 56 33 90 35 C56 37 48 44 45 70 C42 44 34 37 0 35 C34 33 42 26 45 0Z" /></svg>
+    </div>
+    <div data-hf-id="hf-iazk" id="c-carousel-rule-0" class="abs rule-h" style="width:355px"></div>
+    <div data-hf-id="hf-2lh5" id="c-carousel-rule-1" class="abs rule-h" style="width:355px"></div>
+
+    <!-- Firecrawl badge -->
+    <div data-hf-id="hf-bctd" class="abs ring" style="left:531px;top:360px"></div>
+    <div data-hf-id="hf-8c3a" class="abs disc" style="left:531px;top:360px"></div>
+    <div data-hf-id="hf-efca" id="c-badge-flame" class="abs logo-copy"></div>
+
+    <!-- connector: open link (broken) and closed link (linked) cross-fade -->
+    <div data-hf-id="hf-ba4i" id="c-connector">
+      <div data-hf-id="hf-tiyn" id="c-connector-disc" class="abs"></div>
+      <svg data-hf-id="hf-16a4" id="c-link-open" class="abs" viewBox="0 0 42 23"><path data-hf-id="hf-q1t1" d="M15 1 H12 C-2 1 -2 22 12 22 H15 M27 1 H30 C44 1 44 22 30 22 H27 M13 11.5 H29" /></svg>
+      <svg data-hf-id="hf-ttkc" id="c-link-closed" class="abs" viewBox="0 0 32 20"><path data-hf-id="hf-m4ok" d="M9 1 H23 C35 1 35 19 23 19 H9 C-3 19 -3 1 9 1Z M9 10 H23" /></svg>
+    </div>
+
+    <!-- pixel megaphone: per-frame stepped bands (white outlined base, orange, gray) -->
+    <svg data-hf-id="hf-e5uy" id="c-horn" class="abs" viewBox="0 0 2400 720"><path data-hf-id="hf-htaw" id="c-horn-w" /><path data-hf-id="hf-7ii8" id="c-horn-o" /><path data-hf-id="hf-yy3s" id="c-horn-g" /></svg>
+  </div>
+
+  <!-- call to action, from the page -->
+  <div data-hf-id="hf-qho6" id="c-apply" class="abs"><div data-hf-id="hf-5vvm" id="c-apply-in">Apply for Exo Membership</div></div>
+
+  <!-- final lockup -->
+  <div data-hf-id="hf-mbf3" id="c-lockup" class="abs" data-brand-mark>
+    <div data-hf-id="hf-pkqa" id="c-flame">
+      <div data-hf-id="hf-acvb" id="c-flame-grid"><div data-hf-id="hf-hptt" id="c-flame-grid-y"><div data-hf-id="hf-c327" id="c-flame-dots"></div></div></div>
+      <div data-hf-id="hf-9p8o" id="c-flame-solid"><img data-hf-id="hf-vrk4" data-slot="logo" src="assets/brand/exo-orb.png" alt="" /></div>
+    </div>
+    <div data-hf-id="hf-osxd" id="c-wordmark" data-slot="wordmark">Exo</div>
+  </div>
+</div>
+</div>
+</div>
+<script>
+(() => {
+
+// measured horn band rects per frame 0–66 (white outlined base, orange, gray), decoded by decodeHorn() below
+const HORN = {
+  w: "a4u78a9q9uaaoataaYb2ababeb3Z4rb4u78b7c7DC3w3WC3Z4rc4u78D303tD3w3WD3Z4rd4u78E2m2XE303tE3w3WE3Z4qe4u78F1V2jF2m2XF303tF3w3Wf3Z4rf4u5Gf5U78f7c7Dg1k1SG1V2jG2m2XG303tg3x3Wg3Z4rg4u5og6i78g7c7Dg7G87g9Jaih1c1ih1k1TH1V2jh2m2Xh303sH3w3Wh404qh4u4Qh6Q78h7c7Dh898Ch8E9gh9Kaihakari1c1iI1k1Si1Y2ji2m2WI303tI3w3WI3Z4oi8F9gi9j9Diakarj1c1iJ1k1Sj1Y2jj2m2WJ303tj3w3Cj7Y86j8F9gj9j9Djakar|a4u78a9q9uaapatB3Z4rb4u78C3w3WC3Z4rc4u78D303tD3w3WD3Z4rd4u78E2k2XE303tE3w3We3Z4re4u5Ie5S78e7c7DF1S2iF2k2XF303tF3w3Wf3Z4rf4u5qf6a78f7c7DG1d1PG1S2iG2k2XG303tg3x3Wg3Z4rg4u54g6A78g7c7Dg7G87H0V1ah1d1Qh1S2iH2k2Xh303sH3w3Wh404oh7d7Dh898Ch9l9Kh9NapI0W12I151ai1d1QI1S2iI2k2XI303tI3w3Wi3Z4ai7u7Di9NapJ0W12J151aj1d1QJ1S2iJ2k2Xj303pj8c8Cj9Nap|a4u78B3Z4rb4u78C3w3WC3Z4rc4u5Gc5U78D303tD3w3WD3Z4rD4u5CE2k2XE303tE3w3We3Z4re4u5qe6g78e7c7DF1O2hF2k2XF303tF3w3Wf3Z4rf4u52f6y78f7c7DG141Mg1P2hG2k2XG303tg3x3Wg3Z4rG4u4Kg7c7Dg7G87g9l9OH0D12H141Mh1O2hH2k2Xh303sH3w3Wh404gh7m7Dh898Ch9l9NI0l0Ai0D12I141MI1O2hI2k2XI303tI3w3OiaAaYJ0l0Aj0D12J141Mj1P2hJ2k2XJ3036j9l9OjaAaY|a4u78B3Z4rb4u78C3w3WC3Z4rc4u5Gc5U78D303tD3w3WD3Z4rd4u5Bd6078E2k2XE303tE3w3We3Z4re4u5qe6g78e7c7DF1O2hF2k2XF303tF3w3Wf3Z4rf4u52f6y78f7c7DG141Mg1P2hG2k2XG303tg3x3Wg3Z4rG4u4Kg7c7Dg7G87g9l9OH0D12H141MH1O2hH2k2Xh303sH3w3Wh404gh7m7Dh898CI0l0Ai0D12I141MI1O2hI2k2XI303tI3w3OiaAaYJ0l0Aj0D12J141Mj1P2hJ2k2XJ3036j9l9OjaAaY|a4u78B3Z4rB4u5GC3w3WC3Z4rC4u5CD303tD3w3WD3Z4rD4u5uE2k2XE303tE3w3We3Z4rE4u5ie7c7DF1O2hF2k2XF303tF3w3Wf3Z4rf4u4Wf6E78f7c7Dg121LG1O2hG2k2Xg303sg3w3Wg3Z4rg4t4Eg6Y78g7c7Dg7G87g898Cg9QaAh0y0Zh121MH1O2hh2k2Xh303sh3v3WH3Z48h7G86h898Ch8E9ih9RaBhaDb5i0a0ri0y0YI121LI1O2hI2k2XI303ti3v3Ci7Z86iaDb5ib7btj0a0rj0y0YJ121LJ1O2hJ2k2XjaDb5jb7bt|A4u5GB3Z4rB4u5GC3w3WC3Z4rC4u5uD303tD3w3WD3Z4rD4u5qE2k2XE303tE3w3We3Z4rE4u5ee7c7DF1O2hF2k2XF303tF3w3Wf3Z4rF4u4Uf7c7Dg101LG1O2hG2k2Xg303sg3w3Wg3Z4rg4u4yg7c7Dg7G87g898Cg9RaBh0u0XH101LH1O2hh2k2Xh303sh3v3Wh7G86h898Ch8E9ihaEb9i030nI0u0XI101LI1O2hI2k2XI303tibcbzj030nJ0u0XJ101LJ1O2hJ2k2Qjbcbz|a4u5Ga5U78B3Z4rb4u5Ab6378C3w3WC3Z4rC4u5qD303tD3w3WD3Z4rd4u5ld6g78E2k2XE303tE3w3We3Z4rE4u5ae7c7De9S9XF1O2hF2k2XF303tF3w3Wf3Z4rf4u4Kf6N78f7c7Dg0Z1LG1O2hG2k2Xg303sg3w3Wg3Z4qg7b7Dg7G87g898Cg9RaCh0r0XH101LH1O2hH2k2Xh303sh3v3Sh7G86h898ChaFbci030oi0r0Xi101LI1O2hI2k2XI303oi9RaDiaGbbibfbzj030oj0r0Xj101LJ1O2hj2k2Ij8W9ij9RaDjaGbbjbfbz|A4u5AB3Z4rB4u5sC3w3WC3Z4rC4u5kD303tD3w3WD3Z4rd4u5id6s78E2k2XE303tE3w3We3Z4rE4u54e7c7De9R9VF1O2hF2k2XF303tF3w3Wf3Z4rf4u4Lf6Y78f7c7DG0Z1LG1O2hG2k2XG303tg3x3Wg3Z4jg7k7Dg7G87h0o0Wh101LH1O2hH2k2Xh303sh3w3Kh8086h898Ch9RaDhaGbfi030li0o0Wi101Li1N2hi2k2Wi8F9ii9l9Oi9RaDiaGbfibibzj030lj0o0WJ0Z1Lj1O2ej9m9PjaGbfjbibz|A4u5AB3Z4rB4u5sC3w3WC3Z4rC4u5kD303tD3w3WD3Z4rd4u5id6s78E2k2XE303tE3w3We3Z4rE4u54e7c7De9R9VF1O2hF2k2XF303tF3w3Wf3Z4rf4u4Lf6Y78f7c7Dg101LG1O2hG2k2XG303tg3x3Wg3Z4jg7k7Dg7G87g9RaDh0o0Wh101LH1O2hH2k2Xh303sh3w3Kh8086h898Ch9RaDhaGbfI030lI0o0Wi101Li1N2hi2k2Wi8F9ii9l9Oi9RaDJ030lJ0o0WJ0Z1Lj1O2ej9m9P|a4u5ya6278B3Z4rb4u5sb6c78C3w3WC3Z4rc4u5ic6m78D303tD3w3WD3Z4rd4u5gd6s78E2k2XE303tE3w3We3Z4re4u52e6C78e7c7De9R9VF1O2hF2k2XF303tF3w3Wf3Z4rF4u4If7c7Dg101LG1O2hG2k2XG303tg3w3WG3Z4gg7G87g9RaDH0n0Wh101LH1O2hH2k2Xh303rH3w3Ah898Ch9RaDI030kI0n0Wi101LI1O2hi2k2Pi8O9ii9RaDj030lj0o0WJ0Z1Lj1O1Wj9G9PjaGbfjbibz|a4u5ya6678B3Z4rB4u5qC3w3WC3Z4rc4u5gc6o78D303tD3w3WD3Z4rd4u5ed6q78E2k2XE303tE3w3We3Z4rE4u50e7c7De9R9VF1O2hF2k2XF303tF3w3Wf3Z4rF4u4Ef7c7DG101LG1O2hG2k2Xg303sg3w3Wg3Z44g7G87g898Ch0n0Wh0Z1LH1O2hH2k2XH303mh9RaChaFbfi030li0o0Wi101LI1O2hi9a9ii9RaDiaGbfibibzj030lj0o0Wj101yja4aDjaGbfjbibz|a4u5ya6878B3Z4rB4u5oC3w3WC3Z4rc4u5ec6q78D303tD3w3WD3Z4rD4u5aE2k2XE303tE3w3We3Z4re4u4Ue6G78e7c7De9R9VF1O2hF2k2XF303tF3w3Wf3Z4rf7c7DG101LG1O2hG2k2Xg303sg3w3Sg7K87g898Ch0n0Wh0Z1LH1O2hH2k2Xh9RaChaFbfi030li0o0Wi101Li1O1Yi9C9Oi9RaDiaGbfibibzj030lj0o0WjayaDjaGbfjbibz|a4u5wa6878B3Z4rB4u5kC3w3WC3Z4rc4u55c6u78D303tD3w3WD3Z4rD4u4WE2k2XE303tE3w3We3Z4re4u4Ge6U78e7c7DF1O2hF2k2XF303tF3w3Wf7y7Dg101LG1O2hG2k2XG3036g9RaDH0n0WH0Z1Lh9K9OI030ki0n0TiaIbfJ030k|=|A4u5uB3Z4rb4u5ib6i78C3w3WC3Z4rc4u52c6y78D303tD3w3WD3Z4rd4u4Td6K78E2k2XE303tE3w3We3Z4re7c7DF1O2hF2k2XF303tf3w3Ef7U86g101LG1O2hg969ig9RaDH0n0WH0Z1jI030ki0n0yib2bfJ030gJ5I5N|A4u5sB3Z4rb4u5gb6s78C3w3WC3Z4rc4u4Yc6G78D303tD3w3WD3Z4rD4u4EE2k2XE303tE3w3We3Z4ae7u7DF1O2hF2k2Xf3036f8s8CG101LG1O1Yh0n0UhaHbfI030ki5K5Sj030aj516Bjbubz|A4u5qB3Z4rB4u5aC3w3WC3Z4rc4u4Nc6O78D303tD3w3WD3Z4oE2k2XE303tE3w3CF1O2hf2k2Ef8W9ig101yga0aCh0n0Ch5K5ShaWbfI030gi5f6nj4n7f|A4u5gB3Z4rb4u4Qb6S78C3w3Wc3Z4ic7o7DD303td3w3Ed7W86e2k2Qe8K9if1O26f9u9Og101ag5q6cgaqaCh4T6Ji4r7bj3H7V|=|A4u58B3Z4rb4u4AC3w3Wd303od8c8Ce2k2Ae8Y9iF1O1Wf5w66g1016g576vgayaCh4D6Zi4c7qj3t89|a4u4Wa6I78b3Z4gb7o7Dc3w3Mc7O86D303ee2k2se5C60e989if5g6mf9K9Og4V6Hh4t7ai407Cj3i8k|a4u4Ia6S78B3Z48c3w3Ec7U86d3036d5G5Xd8v8Ce5s6ae9e9if586vg4N6Qh4k7ji3Q7Mj398t|a7478b5H5Vc5x65d5s69e5f6mf4W6Gg4A72h457xi3A82J2T5G|=|a5K5Sb5B60c5s6ad5q6de5c6qf4S6Jg4v76h407Ci3s5Ii5V8aj2K4Uj6I8T|a5G5Wb5y64c5p6cd5n6ge586tf4P6Mg4s7ah3U5Ih5W7Ii3i5ci6s8kj2y4ij7m94|a5F5Yb5v67c5m6gd5l6ie556wf4N6PG4n5Ih3M5ih6m7Qi364Ii6W8wj2k3Uj7K9i|a5B61b5s6ac5i6kd5g6me515Ge5S6Af4F5sf6c6Xg4854g6A7uH3n4CI2w4aj1C3qj8g9Z|=|a5A63b5q6ac5g6md5e5Kd5S6pe4Y5Ae626Df4y5af6q74g3W4Ug6M7GH334qi233Ui7E9zJ193e|a5z64b5q6cc5e5Ic5W6od5a5Cd626se4T5qe6e6Jf4o52f6y7eg3D4Kg6Y7ZH2z4gi1t3Ki7OaaJ0K36|a5y65b5o5Ib5W6ec5b5Cc626sd555ud6a6yE4K5if484Uf6G7uG3b4EH1W48i0X3Ei7YaEJ0u2Y|a5u5Ia5V68b5j5yb636kc4Z5qc6e6Ed4J5kd6k6TE485af3d4Kf6M8pg224ug789Bh123Uh7EaBi0q3mi8ebcj0d2Ij8Vbp|A5u5Ib5i5yb636kc4Z5qc6e6Ed4J5kd6k6TE485af3d4Kf6M8pg224ug789Bh123Uh7EaBi0q3mi8ebcj0d2Ij8Vbp|a5s5Ea5Y6bb5c5sb666pC4O5kD4o5iE3A56f2J4Kf6Q8TG1F4qH0M3Si0h3ei8kblJ082A|a5n5Ba636fb545sb696yc4y5ic6i74d3X5id6q7Ge3654e6y8xF2p4GG1q4mh0D3Mh7Qb0i0b38i8wbrj052mj9ibx|A5g5Ab4Q5qb6b6Mc4b5ic6m7qd3C5ed6o85e2L52e6A8Sf2b4Ef6U9rg1g4eg7mamh0w3Eh7Yb7i062Yi8Gbvj032cj9wbz|a4S5ya646Mb4f5ib6e7nC3E5cD345ae2m4Ue6E9gf1V4wf749Hg1344g7Aazh0n3mh8gbgI032Aj031Qj9Obz|a4S5ya646Mb4f5ib6e7nC3E5cD345ae2m4Ue6E9gf1V4wf749Hg1344g7Aazh0n3mh8gbgi032Ai94bzj031Qj9Obz|a4E5wa6670b445gb6g7yc3v5ac6q86d2Z5ad6u8De2j4Ue6G9jf1R4wf7a9LG103Wh0n3ah8sbgi032ki9gbzj031Aja4bz|a4t5ua6979b3Y5kb6g7Ec3v5ac6s86D2Z54e2j4Oe6S9jF1O4og0Y3Mg7QaDh0n2Qh2S2Wh8KbgI0324J031i|A4t5ub3Y5gb6i7Ec3v56c6w86D2Z50e2j4Me6W9jf1N4gf7o9Pg0Y3yg84aDh0n2Eh94bgi031Fi9UbzJ030Y|A4t5sb3Y5cb6m7Ec3v4Yc6E86d2Z4Qd6O8De2j4we789jF1N3Sg0Y2Ug8KaDh0n1Sh9Obgi020ViaEbAJ020w|=|A4t5qB3Y5cc3v4Uc6I86d2Z4Ed6U8DE2j4if1N3sf3u3yf829Pg0Y2qg9aaEh0m1qha8bgi020IiaYbAj010ojbgbA|a4t5ma6h79b3Y5ab6u7Ec3v4Oc6Q86d2Z4ud768DE2j40f1N3ef8q9Pg0Y26g9uaDh0m18hawbgi010wibabBJ010g|A4t5kb3Y50b6A7Ec3v4Gc6W86d2Z4gd7k8De2j3Ee7U9jF1N2QG0Y1Oh0m0UhaGbgI000o|a4t5aa6q79b3Y4Ob6Q7Ec3v4gc7k86d2Z3Md7U8DE2j36f1N2kf9g9PG0Y1oH0m0EI000c|a4t5aa6q79b3Y4Ob6Q7Ec3v4gc7k88d2Z3Md7U8EE2j36f1N2kf9g9PG0Y1oH0m0EI000c|a4t52a6y79b3Y4Eb6Z7Ec3v44c7y88d2Z3yd858EE2j2Sf1N2af9q9Pg0Y12gasaEh0m0yhb6bgI0008|A4u4Ub3Z4ob7d7Dc3w3Sc7I86d303od8f8CE2k2If1O23f9y9OG0Z1aI0006|A4u4MB3Z4iC3w3Md303gd8n8CE2k2Af1O1Xf9E9OG0Z14j5G5W|a4u4Ea7078B3Z48C3w3CD3036E2k2og5M5Qh5M5Ri5A64j5m6g|a4u4Ea7078B3Z48C3w3CD3036E2k2og5M5Qh5M5Ri5B62j5m6g|a7478b3Z44f5M5Qh5E5Wi5o6ej526Ak526A|e5M5Qf5K5Ug5C5Wh5s6ci556Aj4w76k4w76|b8P8TcaVb1d5M5Qe5K5Se9m9tf5C5Wg5q6ch5a6vi4w76j3C86k3C86|b3S3Wc5I5Md5G5We5q6cf586ug4G6Yh3A81i249yj1cawk1caw|b3S3Wc5K5Sd5C60e5q6cf5a6ug4G6Yh3C81i249yj1dawk1caw|b3S3Wb5I5Sc5C60d5q6ce5a6tf4G6Yg3S7Sh2c9si16awj0wb6k0wb6|a5K5Ob3S3Wb5C5Wc5u6cd586te4E6Yf3Q7Sg2A92h1eaoi0wb6j0gbmk0gbm|a5E5Yb3S3Wb5q6cc5a6tc9t9xd4E6Ye3Q7Sf2s92g1O9Yh0MaYi0ebuj00bCk00bC|a5g6kb4E6Yc3L7Sd2q9ce1za4f14azg0IaTh00bCi00bCj00bCk00bCl00bC|a5g6kb4E6Yc3L7Sd2q9ce1ya4f14aAg0IaRh00bCi00bCj00bCk00bCl00bC|a4Q6Maaoazb3J7Tc2q9cd1Aa3e14axf0KaUg0wb6h00bCi00bCj00bCk00bCl00bCm00bC|b2l9bc1ya4d12aAe0MaWf0wb6g0lbigbnbCh00bCi00bCj00bCk00bCl00bCm00bC|g0cbqh0dbmi00bCj00bCk00bCl0064l6EbCm00bC",
+  o: "f5M5Qg5q6ch4T6Ii4q7cj3G7W|f5w67g566wh4D6Yi4c7qj3t89|d5F5Xe5r6bf586ug4M6Qh4i7ji3Q7Mj388u|=|c5F5Wd5x65e5k6if516Bg4G6Wh4c7qi3I7Uj308C|b5H5Uc5x64d5s6ae5f6mf4W6Gg4A72h467xi3A82j2U5Hj5V8J|a5K5Sb5B60c5s6ad5o6ee5c6qf4S6Jg4w76h407CI3s5JJ2K50|a5E5Yb5w66c5m6gd5j6ie556wf4N6PG4o5KH3M5iI364JJ2k3X|=|a5C60b5t68c5j6id5h6ke536zF4K5LG4h5qh3B4Sh6K80i2Q4qi7d8Mj223Fj7W9A|a5A62b5s6ac5h6kd5g6mE525MF4F5uG4856H3n4Ci2w4ai7r96J1D3s|a5z63b5q6cc5g6md5e5Md5Q6pe4Y5Be616DF4y5fG3W4Uh324rh7c8zI223ZJ193h|a5y64b5o5Mb5P6eC5a5Ed555wd666we4L5je6i6QF4850G3b4EH1W4aI0X3GJ0u30|=|A5w5NB5m5GC565wd4Y5rd6b6FE4y5eF3K4VG2A4zH1o44I0D3zJ0k2S|a5u5Ja5U68B5i5Ac505rc6c6Cd4M5nd6e6QE4c5af3d4Sf6L8pG224vh113Yh7EaAI0q3rJ0d2I|A5s5FB5e5wc4R5nc6e6KD4u5kE3H57f2K4Of6O8Tg1G4qg7b9XH0M3Si0h3ii8lblJ082x|A5i5AB4U5sC4k5iD3I5gE2U52F2c4IG1g4gh0w3Ah82b8I062Qj0420j9Cbz|=|A5a5zB4D5rC435gd3s5ed6o89E2H50F224EG1847H0q3mi042ui97byJ041C|a4Y5ya646FB4o5qC3S5ed3i5cd6q8jE2y4Xf1W4xf769GG143UH0m32i0322i9BbyJ0418|A4M5xB4e5oC3K5cd3b58d6u8qE2s4SF1R4mG103CH0m2yi031riabbyj030JjaTby|A4A5vB425kC3A54d334Ud6H8yE2k4uF1N3JG0Y2yh0m1mhafbgi030Cib0byj030jj5I5Ujbjby|A4A5vB425kC3A54d334Ud6H8yE2k4uF1N3JG0Y2yH0m1ni030Cib0byj030jj5I5Ujbjby|a4w5sa6976B405gC3y4YD314IE2j47F1N3cG0Y20H0m10i030oi5K5Sibebyj030cj516Ajbqby|A4u5qB3Y5bc3w4Mc6P86d2Z4od7e8CE2j3zF1N2IG0Y1EH0m0Lh5K5Si030gi5g6mibmbyj0308j4m7gjbuby|A4t5mB3Y52C3w4wD2Z3VE2j34F1N2oG0Y1og5L5RH0m0Ah5k6ji030ai4K6Sibsbyj3Y7E|A4t53B3Y4wc3v3Qc7M86D2Z3eE2j2uF1N20f5w66G0Y17g576vh4E6Yi4c7qj3t89|=|A4t4OB3Y4ec3v3Cc8086e5C60F1N1Uf5g6mG0Y12g4V6Hh4s7ai407Cj3i8k|A4t4AB3Y42d5F5We5r6af586ug4M6Qh4i7ki3Q7Mj388u|c5F5Wd5x64e5k6if526Bg4G6Wh4c7qi3I7Uj308C|a5K5Sb5C61c5s6ad5p6ee5c6qf4S6Kg4w76h407Ci3s89j2L8Q|=|a5G5Wb5y64c5p6ed5m6ge586uf4Q6Mg4s7ah3U7Ii3k8ij2C90|a5E5Yb5w67c5m6gd5j6ie566wf4N6Pg4o7eh3O7Oi3c8qj2s9a|a5C60b5u69c5k6id5h6ke536zf4K6Sg4k7jh3H7Vi328Bj2i9k|a5z63b5q6cc5g6md5e6oe506Cf4C70g477wh3p8di2D8Zj1S9K|=|a5y64b5p6dc5e6od5c6qe4Y6Ef4y75g3Y7Eh3d8pi2o9ej1Ca0|a5y64b5o6ec5c6qd596ue4U6If4r7bg3O7Oh2Y8Ei269xj1kai|a5w66b5n6fc596td556ye4Q6Mf4i7kg3B81h2G8Wi1K9Sj11aB|a5u68b5i6kc526Ad4U6Ie4A72f3U7Ig2Y8Eh1U9Ii10aCj0yb4|=|a5s6ab5g6mc4W6Gd4M6Qe4o7ff3C80g2y94h1wa6i0KaSj0obe|a5q6cb5c6qc4Q6Md4B71e467wf3f8mg2a9sh1dapi0yb4j0ibk|a5m6gb566wc4I6Ud4m7fe3K7Sf2U8Ig1Q9Mh10aDi0qbcj00bC|a5d6ob4Q6Mc4k7id3O7Oe378uf2p9dg1qach0GaWi0eboj00bC|=|a566vb4F6Xc477wd3B81e2U8If2g9ng1iakh0Ab2i0bbsj005Mj5PbC|a4Y6Eb4u78c3W7Gd3q8be2K8Sf289ug1caqh0wb6I085NJ005K|a4Q6Mb4l7gc3P7Od3i8je2C90f229Ag16awH0s5NI065KJ005G|a4G6Xb497sc3E7Yd388ue2r9bF1U5NG105Kh0m5Gh5WbfI025yj005kj6hbC|=|a4C70b467wc3B80d348yE2n5NF1R5KG0Y5GH0m5yI025kJ0051K0051|a4y74b427zc3y84d325Md5P8AE2k5KF1O5GG0Y5zH0m5mI0150J004uK004u|a4w76b407Cc3w5Mc5P86d2Z5Kd5S8CE2j5GF1N5zG0Y5oH0m52I004uJ003uK003u|a4u5Ma5P78B3Y5KC3v5GD2Z5zE2j5oF1N56G0Y4CH0m3yI0020j0013jaAbCk0013kaAbC|A4u5NB3Y5KC3v5GD2Z5zE2j5oF1N56G0Y4CH0m3yI0020j0013jaAbCk0013kaAbC|A4t5KB3Y5GC3v5zD2Z5oE2j56F1N4CG0Y3Jh0m27h9wbgi0013iaAbCJ000uK000u|A4t5HB3Y5zC3v5od2Z56d6w8Ee2j4De709jf1N3Kf7T9PG0Y2qh0m1bhasbgI000uJ0007K0007|a4t5Aa6179B3Y5oC3v56D2Z4Ce2j3Ke7T9jF1N2qg0Y1zga4aEH0m0DI0007|A4t5cB3Y4Cc3u3Jc7T87|=|A4t4O||",
+  g: "||||||i5M5Qj526A|h5m6gi4M6Qj467C|=|g5y68h4U50h526Ii4u76j3I3Qj3S7S|f5y5Ef5G64g586sh4G4Kh4M6Yi4o7mj3C80|e5I5Wf5k6ig506Ch4u78i487ai7c7uj3m8g|c5G5Wd5y62e5s5we5y6cf546Ag4K6Qh4c7mi3Q7ai7c7Sj348y|c5G5Wd5y62e5s5we5y6cf546Ag4K6Qh4c7mi3Q7Sj348y|b5M5Sc5y64d5u66e5q6kf4Y6Eg4E6Yh467ui3E80J2W5H|b5G5Yc5v68d5q6ce5m6mf4U6Ig4E70h407Ai3C5Ji5T88j2Q50j6C8Q|b5G5Wc5q6cd5o6ee5a6qf4S6Kg4w76H3W5Ji3q5di6o8gj2A4lj7i92|a5G5Qb5y66c5s6gd5k6ke5a6sF4M5LG4o5qH3C4Si2Y4pi7d8Kj243Fj7Y9y|a5G5Ub5y66c5o6gd5k6ke5a6sF4M5LG4o5qH3C4Si2Y4pi7d8Kj243Fj7Y9y|a5G5Wb5u5yb5A62c5k6kd5i6ge585Me5Q6sf4I4OF4S5vg4g56g6w7oh3q4Ch708ei2y4bi7r8Ki8M94j1M3sj8a9W|a5E5Yb5y62c5i6kd5g5Md5Q6ie5a5Be616wf4A5ff6n70G404Uh344qh7b8wI243Zj1i3hj8laq|a5E62b5w6cc5j5Mc5Q6id5a5Ed5Y6qe4W5qe6c6IF4q56g3G4Mg6R7Uh2A4hh7k92i1y3Pi7Na8j0M37j8uaQ|a5C5Na5P64b5s5Gb5W6eC5a5wd4Y5rd6b6ye4y5ee6o6Yf3S4Vf6H7MG2A4zh1y44h7yaci0M3zi83aWj0u2Sj8Kbg|=|a5A5Ja5T66b5o5Ab626iC545rd4M5nd6f6KE485af3m4Rf6L8mG244vh143Yh7EaAi0y3ri8bbaJ0g2I|a5w5Fa5Y68b5e5ib5k5xb656oc4S5nc6f6GD4q5kE3C57f2Q4Of6O8Og1G4qg7b9Wh0U3Sh7JaOi0o0si0u3hi8lbiJ0a2x|a5s5Ca606cb5a5ub686wC4C5kd405id6k7EE3654f2w4Mf6Q98g1s4mg7ga4H0E3LI0g35j0g2ij9jbm|a5g5za636sb4C5rb6b6YC3S5gd3m5ed6o8ke2A50e6C96F244Eg1c47g7vasH0w3mi0a2vi98buJ001C|a5g5za636sB4E5rC3S5gd3m5ed6o8ke2A50e6C96F244EG1a47H0w3mi0a2vi98buJ001C|A4U5yb4g4kb4m5qb6d7mc3G5fc6o7WD365cE2q4Xf1W4xf759Eg1i3Vg7Iaqh0l32h8AbgI0021J0018|a4E5xa6670B485oc3C5cc6q82d3659d6t8De2k4Se6L9gF1U4nG123Ch0l2yh94bgi001qiabbCJ000J|a4u5wa6679B425nc3C59c6t82d3453d6z8De2k4Je6T9gf1U47f7v9Mg0Y39g8saFh0l1Uh9HbgI000WJ000t|a4u5ta6a79B425hc3C4Xc6E82d344Id6U8De2i47e7w9kf1M3cf8r9Kg0Y20g9CaFh0l10haCbgI000pJ000c|a4u5ta6979b425hb6l7Cc3C4Xc6E82d344Id6U8De2i47e7w9kf1M3cf8r9KG0Y20h0l10haCbgI000pJ000c|a4u5qa6c79B3X5bc3C4Nc6P82d2Z4nd7e8EE2i3zF1M2IG0Y1Eh0l0KhaRbgI000gJ0007|A4s5lB3X52c3y4xc7588D2Y3VE2i34f1M2nf9e9Qg0Y1pgaeaEh0l0Ahb2bgI000aJ0004|a4u5ea6o79B3X4Oc3C4ac7s84D2Y3vE2i2IF1M2ag0Y1fgaoaEh0l0thb9bgi0005ibwbC|a4s4Na6O79B3X4eC3u3Cd2Y32F1M1UG0Y12|a4s4Na6O7aB3X4eC3u3Cd2Y32F1M1UG0Y12|A4s4zB3X42F1M1Q|||||||||||||||||||||||||||"
+};
+
+
+const PARAMS = {
+  flameSway: 0,      // multiplier on the measured flame-tip sway (0 = rigid logo)
+  dotSeed: 28,       // technical dot field: seed, count, drift px/frame
+  dotCount: 1900,
+  dotDrift: 0.35,
+  crossSeed: 7,      // cross-mark patches: seed and share of 12px lattice cells marked
+  crossFill: 0.4,
+};
+const FPS = 30, DUR = 6.434;
+const $ = s => document.querySelector(s);
+const tl = gsap.timeline({ paused: true });
+window.__timelines = window.__timelines || {};
+window.__timelines["cta"] = tl;
+
+const F = t => Math.round(t * FPS) / FPS;   // motion.md times are frame/30 rounded to ms: snap back to the frame
+// track(el, prop, [[t, v], ...]): linear between keys, a repeated t is a hard step, equal values hold
+function track(el, prop, keys) {
+  tl.set(el, { [prop]: keys[0][1] }, 0);
+  if (keys[0][0] > 0) tl.set(el, { [prop]: keys[0][1] }, F(keys[0][0]) - 1e-4);
+  for (let i = 1; i < keys.length; i++) {
+    const [t0, v0] = keys[i - 1], [t1, v1] = keys[i];
+    if (F(t1) === F(t0)) tl.set(el, { [prop]: v1 }, F(t1) - 1e-4);
+    else if (v1 !== v0) tl.fromTo(el, { [prop]: v0 }, { [prop]: v1, duration: F(t1) - F(t0), ease: 'none', immediateRender: false }, F(t0));
+  }
+}
+const show = (el, t0, t1) => { tl.set(el, { visibility: t0 > 0 ? 'hidden' : 'visible' }, 0); if (t0 > 0) tl.set(el, { visibility: 'visible' }, F(t0) - 1e-4); if (t1) tl.set(el, { visibility: 'hidden' }, F(t1) - 1e-4); };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function rng(seed) { let s = seed >>> 0; return () => { s += 0x6D2B79F5; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+// the logo slot feeds every flame copy (badge, pixel-grid silhouette)
+const logoSrc = $('[data-slot="logo"]').getAttribute('src');
+document.querySelectorAll('.logo-copy').forEach(el => el.style.backgroundImage = `url("${logoSrc}")`);
+$('#c-flame-dots').style.maskImage = $('#c-flame-dots').style.webkitMaskImage = `url("${logoSrc}")`;
+
+// cross-mark patches: 20x15 cells on a 12px lattice, 1/3 of marks large (±2.5) and the rest small (±1.5)
+function crossPath(seed) {
+  const q = rng(seed); let d = '';
+  for (let y = 0; y < 180; y += 12) for (let x = 0; x < 240; x += 12) {
+    if (q() >= PARAMS.crossFill) continue;
+    const a = q() < 1 / 3 ? 2.5 : 1.5;
+    d += `M${x - a},${y}h${2 * a}M${x},${y - a}v${2 * a}`;
+  }
+  return d;
+}
+const crosses = [...document.querySelectorAll('.crosses')];
+crosses.forEach((el, i) => el.querySelector('path').setAttribute('d', crossPath(PARAMS.crossSeed + i)));
+
+// technical dot field: seeded pool, each frame a pure function of the frame (drift right, wrap, denser toward the bottom)
+const dotCtx = $('#c-dots').getContext('2d'), dotColor = css('--dots');
+const dotPool = (() => {
+  const q = rng(PARAMS.dotSeed), gauss = () => { let a = 0, c = 0; while (a === 0) a = q(); while (c === 0) c = q(); return Math.sqrt(-2 * Math.log(a)) * Math.cos(2 * Math.PI * c); };
+  return Array.from({ length: PARAMS.dotCount }, () => {
+    const p = { x: q(), y: q(), u: q(), b: Math.min(1, 0.35 * Math.exp(0.6 * gauss())), r: q() };
+    q(); q(); q(); q();   // unused phase / jitter draws, kept so the pool matches the measured seed
+    return p;
+  });
+})();
+function drawDots(f) {
+  const g = dotCtx; g.clearRect(0, 0, 1280, 240); g.fillStyle = dotColor;
+  for (const p of dotPool) {
+    const x = ((p.x * 1280 + PARAMS.dotDrift * f) % 1280 + 1280) % 1280, y = p.y * 240, v = y / 240;
+    const field = v <= 0.6 ? v / 0.6 * 0.8 : 0.8 + (v - 0.6) / 0.4 * 0.2;
+    if (p.u >= 0.45 * field) continue;
+    const lvl = Math.min(7, Math.floor(p.b * 8));
+    g.globalAlpha = (0.25 + 0.25 * (lvl + 0.5) / 8) * (0.35 + 0.65 * p.b);
+    g.beginPath(); g.arc(x, y, 0.8 + 0.8 * p.r, 0, 2 * Math.PI); g.fill();
+  }
+  g.globalAlpha = 1;
+}
+
+// horn frames: HORN.{w,o,g} hold one entry per frame 0–66, '|'-separated; '=' repeats the previous frame.
+// An entry is 5-char rects: column letter (a–n → HORN_X), y0 and y1 in base62; an UPPERCASE letter adds the mirror about y360.
+const HORN_X = [708, 780, 841, 889, 937, 993, 1060, 1113, 1168, 1232, 1280, 1500, 1800, 2300];
+const B62 = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', b62 = s => B62.indexOf(s[0]) * 62 + B62.indexOf(s[1]);
+function decodeHorn(str) {
+  let prev = '';
+  return str.split('|').map(fr => {
+    if (fr === '=') return prev;
+    let d = '';
+    for (let i = 0; i < fr.length; i += 5) {
+      const c = fr[i], k = c.toLowerCase().charCodeAt(0) - 97, x0 = HORN_X[k], x1 = HORN_X[k + 1];
+      const y0 = b62(fr.slice(i + 1, i + 3)), y1 = b62(fr.slice(i + 3, i + 5));
+      d += `M${x0},${y0}H${x1}V${y1}H${x0}Z`;
+      if (c !== c.toLowerCase()) d += `M${x0},${720 - y1}H${x1}V${720 - y0}H${x0}Z`;
+    }
+    return prev = d;
+  });
+}
+const hornFrames = { w: decodeHorn(HORN.w), o: decodeHorn(HORN.o), g: decodeHorn(HORN.g) };
+const hornEls = { w: $('#c-horn-w'), o: $('#c-horn-o'), g: $('#c-horn-g') };
+
+// flame sway: measured tip x offset per frame (px) → a shear about the fixed base
+const SWAY_BADGE = [7.6, 5.3, 1.2, 1.2, -1.9, -1.8, -3.2, -7.9, -7.9, -9.3, -9.9, -10.9, -9.7, -9.7, -6.8, -4.8, -2.4, 0.1, 0.1, 0.4, 2.1, 4.1, 7.1, 7.1, 7.3, 8.9, 9.3, 8, 8, 5.1, 4.4, 0.3, -2.1, -2.1, -3.4, -6.4, -7.9, -9.4, -9.4, -10.3, -9.7, -7.8, -6.5, -6.5, -4.5, -2, 0.1, 2.1, 2.1, 3.2, 4.8, 7.1, 7.7, 8.7, 8.6, 10.1, 5.6, -15.9, 3.1, 1.3, -2.9, -4.1, -10.2, -10.2, 2.8];          // frames 0–64, badge flame (tip 72 px above base)
+const SWAY_FINAL = [-0, -0.9, -1.9, -2.8, -3.7, -4.6, -3, -1.4, 0.2, 1.8, 2.7, 3.6, 4.6, 5.5, 7.3, 9.2, 11, 12.8, 12.3, 12.8, 14, 13.4, 9.8, 10.4, 10, 3.7, 2.4, -2.9, -2.9, -6.6, -8.6, -11.5, -13.4, -13.4, -14.1, -14.1, -11.9, -6.2, -6.2, -3.7, -2.5, 2, 5.6, 5.6, 7.3, 9.4, 11.6, 14, 14, 13.4, 12.7, 11.5, 6.6, 6.8, 1.8, -0.9, -1.7, -8.1, -9, -10.5, -12.1, -13.6, -8.9, -8.9, -12, -8.8, -4.5, -0.2, -0.2, 2, 2.1, 5.4, 10.4, 10.4, 12.3, 13.4, 14, 13.9, 13.9, 8.8, 10.2, 4.3, 0.1, 0.1, -3.6, -6.5, -7.3, -12.2, -12.2, -13.6, -14.1, -12.9, -8.5, -8.5, -6.6, -4, -2.3, 2.1, 2.1, 4.5, 8.4, 10.6, 13.9, 13.9, 14, 13.6, 13.4, 5.4, 8, 5.6, 2.7, -2, -5.8, -5.8, -7.3, -11, -12.4, -13.6, -13.6, -12.9, -11.4, -8.2, -8.2, -8.2, -8.2, -8.2, -8.2, -8.2];          // frames 65–192, final flame (tip 104 px above base)
+const shear = (dx, h) => `skewX(${(-Math.atan(dx * PARAMS.flameSway / h) * 180 / Math.PI).toFixed(3)}deg)`;
+
+// wordmark pixel resolve: a solid front sweeps left→right; ahead of it 6px square cells, further ahead faint X marks
+const word = $('#c-wordmark');
+const RESOLVE = [[67, -75], [68, -75], [69, -35], [70, 0], [71, 65], [72, 95], [73, 95], [74, 125], [75, 155], [76, 180], [77, 225], [78, 225], [79, 250], [80, 280], [81, 280], [82, 365], [83, 410]];   // [frame, front px on a 365 px word]
+function pixelResolve(f) {
+  if (f >= 83) { word.style.maskImage = word.style.webkitMaskImage = 'none'; return; }
+  const lerp = () => { for (let i = 1; i < RESOLVE.length; i++) { const [fa, a] = RESOLVE[i - 1], [fb, b] = RESOLVE[i]; if (f <= fb) return a + (b - a) * (f - fa) / (fb - fa); } return 410; };
+  const clamp = x => Math.max(0, Math.min(1, x)), w = Math.max(1, word.scrollWidth), h = 130, k = w / 365, front = lerp() * k;
+  const reach = (f <= 68 ? 65 : f === 69 ? 285 : 420) * k;
+  let ink = '';
+  for (let x = 0; x < w + 6; x += 6) {
+    const z = (front - x) / k, v = clamp((reach - x) / 120);
+    if (v <= 0) continue;
+    for (let y = 0; y < h; y += 6) {
+      const c = x + 3, d = y + 3;
+      if (z > 15) ink += `<rect x="${x}" y="${y}" width="6.1" height="6.1" fill="white"/>`;
+      else if (z > -35) { const s = 4.5 + clamp((z + 35) / 50) * 1.6; ink += `<rect x="${c - s / 2}" y="${d - s / 2}" width="${s}" height="${s}" fill="white" opacity="${0.6 + 0.4 * v}"/>`; }
+      else { const s = 0.7 + 0.9 * v; ink += `<path d="M${c - s},${d - s}L${c + s},${d + s}M${c - s},${d + s}L${c + s},${d - s}" stroke="white" stroke-width="${0.45 + 0.45 * v}" opacity="${0.1 + 0.55 * v}"/>`; }
+    }
+  }
+  const url = `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${ink}</svg>`)}")`;
+  word.style.maskImage = word.style.webkitMaskImage = url;
+  word.style.maskSize = word.style.webkitMaskSize = `${w}px ${h}px`;
+}
+
+// per-frame layers (horn, dots, flame sway, wordmark resolve) all read the frame from one clock
+const badgeFlame = $('#c-badge-flame'), flameImg = $('#c-flame-solid img'), flameDots = $('#c-flame-dots');
+function renderFrame(t) {
+  const f = Math.min(192, Math.floor(t * FPS + 1e-3));
+  if (f < 67) {
+    for (const c of 'wog') hornEls[c].setAttribute('d', hornFrames[c][f] || '');
+    drawDots(f);
+    badgeFlame.style.transform = shear(SWAY_BADGE[Math.min(f, 64)], 72);
+  }
+  if (f >= 65) flameImg.style.transform = flameDots.style.transform = shear(SWAY_FINAL[f - 65], 104);
+  if (f >= 67) pixelResolve(f);
+}
+const clock = { t: 0 };
+tl.to(clock, { t: DUR, duration: DUR, ease: 'none', onUpdate: () => renderFrame(clock.t) }, 0);
+
+// S01 · 0.00–1.80 · diagram: horn waves pulse, connector links then breaks
+tl.addLabel('s01-diagram', 0);
+track('#c-link-open', 'opacity', [[0, 1], [0.167, 0], [0.6, 0], [0.7, 1], [1.3, 1], [1.4, 0]]);
+track('#c-link-open path', 'stroke', [[0, css('--link-off')], [0.167, css('--link-on')], [0.6, css('--link-on')], [0.633, css('--link-fade-1')], [0.667, css('--link-fade-2')], [0.7, css('--link-off')],
+  [1.3, css('--link-off')], [1.333, css('--link-wake-1')], [1.367, css('--link-wake-2')], [1.4, css('--link-on')]]);
+track('#c-link-closed', 'opacity', [[0, 0], [0.167, 1], [0.6, 1], [0.7, 0], [1.3, 0], [1.4, 1]]);
+crosses.forEach((el, i) => track(el, 'x', [[[0, 30], [1, 100], [1.8, 210], [2.2, 258]], [[0, 300], [1, 370], [1.8, 430], [2.2, 478]], [[0, 570], [1, 640], [1.8, 650], [2.2, 698]]][i]));
+
+// S01 · 0.70–1.80 · provider carousel: OpenAI out the top, Gemini in, stepped with real holds
+tl.addLabel('s01-carousel', 0.7);
+track('#c-gemini', 'y', [[0, 720], [0.2, 714], [0.4, 714], [0.533, 710], [0.6, 698], [0.667, 679], [0.7, 661], [0.733, 575.5], [0.767, 575.5], [0.8, 516.5], [0.833, 479.5], [0.867, 455], [0.9, 424], [0.933, 424],
+  [0.967, 413], [1.0, 403.5], [1.033, 396.5], [1.067, 385.5], [1.1, 385.5], [1.133, 381], [1.267, 371], [1.333, 367], [1.467, 363], [1.6, 361], [1.8, 360]]);
+track('#c-openai', 'y', [[0, 366], [0.2, 360], [0.4, 360], [0.533, 356], [0.6, 344], [0.667, 325], [0.7, 307], [0.733, 221], [0.767, 221], [0.8, 161], [0.833, 125], [0.867, 101], [0.9, 70], [0.933, 70],
+  [1.0, 48], [1.033, 39], [1.067, 29], [1.1, 29], [1.133, 25], [1.2, 20], [1.267, 16], [1.333, 13], [1.467, 9], [1.6, 7], [1.8, 6]]);
+track('#c-prev', 'y', [[0, 30], [0.2, 24], [0.4, 24], [0.533, 20], [0.6, 8], [0.667, -11], [0.7, -29], [0.733, -115], [0.767, -115], [0.8, -175], [0.833, -211], [0.867, -235], [0.9, -266], [0.933, -266],
+  [1.0, -288], [1.033, -297], [1.067, -307], [1.1, -307], [1.133, -311], [1.2, -316], [1.267, -320], [1.333, -323], [1.467, -327], [1.6, -329], [1.8, -330]]);
+track('#c-openai-disc', 'scale', [[0, 1], [0.6, 1], [0.667, 0.99], [0.7, 0.95], [0.733, 0.89], [0.767, 0.89], [0.833, 0.73], [0.867, 0.69]]);
+track('#c-openai-disc', 'opacity', [[0, 1], [0.767, 1], [0.8, 0.8], [0.833, 0.15], [0.867, 0]]);
+track('#c-openai-ink', 'scale', [[0, 1], [0.667, 1], [0.7, 0.97], [0.733, 0.92], [0.767, 0.92], [0.8, 0.87], [0.833, 0.79], [0.867, 0.72]]);
+track('#c-openai-ink', 'opacity', [[0, 1], [0.7, 1], [0.733, 0.8], [0.767, 0.8], [0.8, 0.58], [0.833, 0.3], [0.867, 0.17]]);
+track('#c-gemini-disc', 'scale', [[0, 0.7], [0.767, 0.7], [0.8, 0.73], [0.833, 0.87], [0.867, 0.95], [0.9, 0.985], [0.933, 0.985], [1.0, 1]]);
+track('#c-gemini-disc', 'opacity', [[0, 0], [0.767, 0], [0.8, 0.15], [0.833, 0.8], [0.867, 1]]);
+track('#c-gemini-ink', 'scale', [[0, 0.74], [0.733, 0.74], [0.8, 0.8], [0.833, 0.88], [0.867, 0.94], [0.9, 1]]);
+track('#c-gemini-ink', 'opacity', [[0, 0.18], [0.767, 0.18], [0.8, 0.5], [0.833, 0.8], [0.867, 1]]);
+// left-column rules scroll with the carousel and wrap (all steps, no tween)
+const RULE_T = [0, 0.2, 0.533, 0.6, 0.667, 0.7, 0.733, 0.8, 0.833, 0.867, 0.9, 0.967, 1.0, 1.033, 1.067, 1.133, 1.2, 1.267, 1.333, 1.4, 1.467, 1.533, 1.6, 1.8];
+const steps = (el, prop, vals) => RULE_T.forEach((t, i) => tl.set(el, { [prop]: vals[i] }, i ? F(t) - 1e-4 : 0));
+steps('#c-carousel-rule-0', 'y', [188, 182, 178, 166, 147, 129, 43, 691, 655, 631, 600, 589, 578, 569, 559, 555, 550, 546, 543, 541, 539, 538, 537, 536]);
+steps('#c-carousel-rule-1', 'y', [540, 534, 530, 518, 499, 481, 395, 335, 299, 275, 244, 233, 222, 213, 203, 199, 194, 190, 187, 185, 183, 182, 181, 180]);
+
+// S01 · 1.30–1.40 · connector relinks (in the link tracks above)
+tl.addLabel('s01-relink', 1.3);
+
+// S01 · 1.80–2.23 · exit: white stair wipe (horn frames) + world jerks left, frame 62 repeats at 63
+tl.addLabel('s01-exit', 1.8);
+track('#c-world', 'x', [[0, 0], [1.733, 0], [1.8, -2], [1.867, -18], [1.933, -57], [1.967, -88], [2.0, -129], [2.033, -185], [2.067, -368], [2.1, -368], [2.133, -531], [2.167, -800], [2.2, -1100]]);
+show('#c-world', 0, 2.233);
+
+// S01 · 2.17–2.77 · lockup converges left while the flame fills base-up and the word resolves left→right
+tl.addLabel('s01-reveal', 2.167);
+show('#c-lockup', 2.167);
+show('#c-flame-grid', 2.167, 2.767);
+show('#c-wordmark', 2.233);
+track('#c-flame', 'x', [[2.167, 115], [2.2, 78], [2.233, 51], [2.267, 51], [2.3, 38], [2.333, 27], [2.367, 21], [2.4, 11], [2.433, 11], [2.5, 5], [2.533, 3], [2.567, 2], [2.6, 2], [2.633, 1], [2.7, 1], [2.733, 0]]);
+track('#c-wordmark', 'x', [[2.233, 51], [2.267, 51], [2.3, 38], [2.333, 28], [2.367, 23], [2.4, 12], [2.433, 12], [2.467, 8], [2.5, 5], [2.533, 3], [2.633, 1], [2.7, 1], [2.733, 0]]);
+track('#c-flame-grid', 'opacity', [[2.167, 0.55], [2.233, 0.8], [2.3, 0.95], [2.367, 1]]);
+track('#c-flame-grid-y', '--v', [[2.167, 0], [2.2, 0.34], [2.233, 0.78], [2.267, 0.78], [2.3, 0.94], [2.333, 1]]);
+track('#c-flame-solid', '--v', [[2.167, 0], [2.233, 0.025], [2.267, 0.025], [2.3, 0.16], [2.333, 0.33], [2.367, 0.44], [2.4, 0.58], [2.433, 0.58], [2.467, 0.61], [2.5, 0.68], [2.533, 0.73], [2.567, 0.86], [2.6, 0.86], [2.633, 0.94], [2.667, 0.98], [2.733, 1]]);
+
+// S01 · 2.77–6.43 · hold: lockup static, flame keeps swaying
+tl.addLabel('s01-hold', 2.767);
+// the call to action lands under the lockup, then the film holds
+tl.fromTo('#c-apply-in', { opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0px)', duration: 0.25, ease: 'power2.out' }, 3.15);
+// seam in: the diagram is still sliding left as it arrives
+tl.fromTo('#c-enter', { x: 260, filter: 'blur(6px)' }, { x: 0, filter: 'blur(0px)', duration: 0.45, ease: 'power3.out' }, 0);
+renderFrame(0);
+
+})();
+</script>
+</template>

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "exo-hook-hero-reveal",
+  "type": "hyperframes:block",
+  "title": "Exo hook: hero photo heat reveal",
+  "description": "Opening beat (3.6 s). A hero photo burns in false-colour heat, clears surface by surface to the real image, and the line steps in. Needs a 16:9 hero photo at assets/brand/runner-16x9.jpg (bring your own; not shipped).",
+  "stability": "experimental",
+  "dimensions": {
+    "width": 1920,
+    "height": 1080
+  },
+  "duration": 3.6,
+  "tags": [
+    "exo",
+    "hook",
+    "photo",
+    "reveal"
+  ],
+  "files": [
+    {
+      "path": "exo-hook-hero-reveal.html",
+      "target": "compositions/exo-hook-hero-reveal.html",
+      "type": "hyperframes:composition"
+    }
+  ],
+  "x-exo": {
+    "from": "2026-10-26__exo-launch__product-film (launch film, New video)",
+    "projectAssets": [
+      "assets/brand/runner-16x9.jpg",
+      "assets/fonts/GoogleSans.ttf"
+    ]
+  }
+}

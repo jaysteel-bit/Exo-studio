@@ -1,0 +1,37 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "exo-proof-inbox-sheet",
+  "type": "hyperframes:block",
+  "title": "Exo proof: inbox and membership sheet",
+  "description": "Proof beat (7.467 s). Exo joins the inbox and the Membership sheet rolls in, with the orb.",
+  "stability": "experimental",
+  "dimensions": {
+    "width": 1920,
+    "height": 1080
+  },
+  "duration": 7.467,
+  "tags": [
+    "exo",
+    "proof",
+    "ui",
+    "inbox"
+  ],
+  "files": [
+    {
+      "path": "exo-proof-inbox-sheet.html",
+      "target": "compositions/exo-proof-inbox-sheet.html",
+      "type": "hyperframes:composition"
+    },
+    {
+      "path": "assets/brand/exo-orb.png",
+      "target": "assets/brand/exo-orb.png",
+      "type": "hyperframes:asset"
+    }
+  ],
+  "x-exo": {
+    "from": "2026-10-26__exo-launch__product-film (launch film, New video)",
+    "projectAssets": [
+      "assets/fonts/GoogleSans.ttf"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "exo-turn-go-further",
+  "type": "hyperframes:block",
+  "title": "Exo turn: punch through to a giant Exo",
+  "description": "Turn beat (4.034 s). Punches through \"Go further\" into a giant Exo. Needs a hero photo at assets/brand/runner.jpg (bring your own; not shipped).",
+  "stability": "experimental",
+  "dimensions": {
+    "width": 1920,
+    "height": 1080
+  },
+  "duration": 4.034,
+  "tags": [
+    "exo",
+    "turn",
+    "type"
+  ],
+  "files": [
+    {
+      "path": "exo-turn-go-further.html",
+      "target": "compositions/exo-turn-go-further.html",
+      "type": "hyperframes:composition"
+    }
+  ],
+  "x-exo": {
+    "from": "2026-10-26__exo-launch__product-film (launch film, New video)",
+    "projectAssets": [
+      "assets/brand/runner.jpg",
+      "assets/fonts/GoogleSans.ttf"
+    ]
+  }
+}

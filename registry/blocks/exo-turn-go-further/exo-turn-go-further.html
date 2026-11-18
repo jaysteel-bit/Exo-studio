@@ -1,0 +1,210 @@
+<template>
+<style>
+@font-face { font-family: "Google Sans"; src: url("assets/fonts/GoogleSans.ttf") format("truetype"); font-weight: 100 900; }
+#root {
+  --bg-top: #F5F5F0;        
+  --bg-bottom: #E3E3DC;     
+  --bg-pool: #D8D8D2;       
+  --glow-from: #FAFAF7;     
+  --glow-to: #FFFFFF;       
+  --ink-1: #070906;         
+  --ink-2: #2F3031;         
+  --ink-3: #070906;         
+  --ink-4: #1C1E1B;
+  --ink-5: #2F3031;         
+  --ink-6: #070906;
+  --trail: #2F3031;         
+  --wordmark: #070906;      
+  --tone-deep: #2F3031;     
+  --tone-light: #070906;
+  --wash-lilac: #4285F4;    
+  --wash-cyan: #7DD3FC;
+  --wash-teal: #10B981;
+  --tint: #38BDF8;          
+  --tint-2: #7DD3FC;
+  --font-display: "Google Sans", sans-serif;
+  --font-ui: var(--font-display);
+  --weight-display: 500;
+}
+#root { position: absolute; inset: 0; overflow: hidden; background: var(--bg-bottom); }
+#t-stage { position: absolute; left: 0; top: 0; width: 2560px; height: 1440px; overflow: hidden; transform: scale(0.75); transform-origin: 0 0; }
+:where(#t-stage) .layer, :where(#t-stage) .fx { position: absolute; }
+:where(#t-stage) .fx { inset: 0; }
+:where(#t-stage) .blur { filter: blur(calc(var(--blur, 0) * 1px)); }
+#t-bg-base, #t-bg-pool, #t-bg-light { position: absolute; inset: 0; }
+#t-bg-base { background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom)); }
+#t-bg-pool { background: radial-gradient(1849.3px 1741.3px at 38.818% 100%, var(--bg-pool), transparent); }
+#t-bg-light { --glow-k: 0; --glow: color-mix(in srgb, var(--glow-from), var(--glow-to) calc(var(--glow-k) * 100%));
+  background: radial-gradient(1185px 916.9px at 50% 0%, var(--glow) 0%, color-mix(in srgb, var(--glow) 88%, transparent) 30%, transparent 100%); }
+#t-plate { left: -620px; top: 613px; width: 3800px; height: 1100px; transform-origin: 50% 0; --blur: 4; }
+#t-plate .mask { clip-path: url(#t-plate-shape); overflow: hidden; }
+#t-plate img { position: absolute; max-width: none; left: -361.905px; top: -288.889px; width: 4523.81px; height: 1388.89px; }
+#t-headline { left: 0; top: 383px; width: 2560px; height: 300px; opacity: 0.94; transform-origin: 50% 0; --blur: 0; --edge: 0; --headline-size: 218; }
+:where(#t-stage) .headline-box { position: absolute; left: 0; top: -45px; width: 2560px; height: 280px; transform: scale(1.027, 0.97); transform-origin: 50% 0; }
+:where(#t-stage) .headline-text { position: absolute; inset: 0; margin: 0; white-space: pre; text-align: center;
+  font-family: var(--font-display); font-weight: var(--weight-display); font-size: calc(var(--headline-size) * 1px);
+  line-height: 260px; letter-spacing: -2.5px; }
+#t-headline .core { -webkit-mask-image: var(--core-mask); mask-image: var(--core-mask);
+  --core-mask: linear-gradient(90deg, transparent 0%, transparent calc(12% + 3% * var(--edge)), black calc(16% + 4% * var(--edge)),
+    black calc(84% - 4% * var(--edge)), transparent calc(88% - 3% * var(--edge)), transparent 100%); }
+#t-headline .core .headline-text { color: transparent; -webkit-background-clip: text; background-clip: text;
+  background-image: linear-gradient(90deg, var(--ink-1) 0%, var(--ink-2) 20%, var(--ink-3) 48%, var(--ink-4) 69%, var(--ink-5) 82%, var(--ink-6) 100%); }
+#t-headline .trail { --blur: 3; }
+#t-headline .trail .smear { filter: url(#t-smear); }
+#t-headline .trail .edges { -webkit-mask-image: var(--edge-mask); mask-image: var(--edge-mask);
+  --edge-mask: linear-gradient(90deg, black 0%, black calc(12% + 3% * var(--edge)), transparent calc(16% + 4% * var(--edge)),
+    transparent calc(84% - 4% * var(--edge)), black calc(88% - 3% * var(--edge)), black 100%); }
+#t-headline .trail .headline-text { color: var(--trail); }
+#t-wordmark { left: 1226px; top: 0; width: 5500px; height: 2400px; transform: scale(1.19, 1.03); transform-origin: 0 16.0417%;
+  opacity: 0.08; --blur: 35; --cx: -1030.25; --tint-op: 0.52; visibility: hidden; }
+:where(#t-stage) .wordmark-text { position: absolute; left: 0; top: -511px; width: 5500px; height: 2400px; margin: 0; white-space: pre;
+  font-family: var(--font-display); font-weight: var(--weight-display); font-size: 2000px; line-height: 2400px;
+  letter-spacing: -15px; color: var(--wordmark); }
+:where(#t-stage) .wordmark-text.fill { color: transparent; -webkit-background-clip: text; background-clip: text; background-repeat: no-repeat; }
+:where(#t-stage) .fill.tone { clip-path: inset(811px 0 0 0); background-size: 2151.26px 1440px; background-position: calc(var(--cx) * 1px) 511px;
+  background-image: linear-gradient(38deg, var(--tone-deep) 0%, var(--tone-light) 80%, var(--tone-light) 100%); }
+:where(#t-stage) .fill.wash { opacity: 0.68; background-size: 6000px 1440px; background-position: calc((var(--cx) - 1415.966) * 1px) 991px;
+  background-image: radial-gradient(680px 1000px at 25% 75%, var(--wash-lilac) 0%, var(--wash-cyan) 30%,
+    color-mix(in srgb, var(--wash-teal) 75%, transparent) 60%, transparent 100%); }
+:where(#t-stage) .fill.tint { opacity: var(--tint-op); background-size: 5500px 440px; background-position: 0 911px;
+  background-image: linear-gradient(180deg, var(--tint) 0%, var(--tint-2) 55%, transparent 100%); }
+</style>
+<div data-hf-id="hf-2fas" id="root" data-composition-id="turn" data-width="1920" data-height="1080">
+<div data-hf-id="hf-qlmm" id="t-stage">
+  <svg data-hf-id="hf-8rgt" width="0" height="0" style="position:absolute">
+    <defs data-hf-id="hf-mh0t">
+      <clipPath data-hf-id="hf-q5pd" id="t-plate-shape" clipPathUnits="objectBoundingBox">
+        <path data-hf-id="hf-agpm" transform="scale(0.000263158 0.000909091)" d="M 919 0 L 2881 0 Q 2946 0 2988 43 L 3800 1100 L 0 1100 L 812 43 Q 854 0 919 0 Z"/>
+      </clipPath>
+      <filter data-hf-id="hf-c1a3" id="t-smear" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur data-hf-id="hf-1klr" id="t-smear-blur" stdDeviation="6 0"/></filter>
+    </defs>
+  </svg>
+  <!-- paint order (back → front): ground, spectrogram plate, headline, wordmark -->
+  <div data-hf-id="hf-knmh" id="t-bg-base"></div>
+  <div data-hf-id="hf-29l0" id="t-bg-pool"></div>
+  <div data-hf-id="hf-e24u" id="t-bg-light"></div>
+
+  <div data-hf-id="hf-enzo" id="t-plate" class="layer">
+    <div data-hf-id="hf-t9kh" class="fx blur"><div data-hf-id="hf-h1gu" class="fx mask">
+      <img data-hf-id="hf-4888" id="t-plate-photo" src="assets/brand/runner.jpg" alt="runner photo as the plate" style="object-fit:cover">
+    </div></div>
+  </div>
+
+  <div data-hf-id="hf-s5v1" id="t-headline" class="layer blur">
+    <div data-hf-id="hf-3gj3" class="fx core"><div data-hf-id="hf-23pc" class="headline-box">
+      <div data-hf-id="hf-uz7k" class="headline-text"><span data-hf-id="hf-xqru" data-slot="headline">Go further</span></div>
+    </div></div>
+    <div data-hf-id="hf-elaf" class="headline-box trail blur"><div data-hf-id="hf-i2o6" class="fx smear"><div data-hf-id="hf-3mqg" class="fx edges">
+      <div data-hf-id="hf-4uvv" class="headline-text" aria-hidden="true"></div>
+    </div></div></div>
+  </div>
+
+  <div data-hf-id="hf-6k0y" id="t-wordmark" class="layer blur">
+    <div data-hf-id="hf-ub9d" class="wordmark-text"><span data-hf-id="hf-shmd" data-slot="wordmark">Exo</span></div>
+  </div>
+</div>
+</div>
+<script>
+(() => {
+
+const PARAMS = {
+  headlineMaxWidth: 2050,   // a longer headline shrinks its font until its text is this wide (source ink ≈ 1890 px before the 1.027 stretch)
+  headlineSize: 218,        // headline font size, px
+  wordmarkScaleX: 1.19,     // horizontal stretch of the wordmark (the colour wash compensates for it)
+};
+
+// Measured motion (motion.md), "t:value" pairs, t in seconds from the scene start, linear between keys.
+const MOTION = {
+  plateY:      '0:613 0.133:621 0.333:631 0.467:639 0.667:648 0.733:652 1:664 1.4:686 1.6:702 1.8:720 2:744 2.067:753 2.133:766 2.267:798 2.4:842 2.467:870 2.533:908 2.6:958 2.633:992 2.667:1032 2.7:1082 2.733:1147 2.767:1238 2.8:1368',
+  plateSX:     '0:1 0.8:1.035 1.6:1.08 2:1.13 2.2:1.185 2.333:1.225 2.467:1.33 2.6:1.55 2.8:2.5',
+  plateBlur:   '0:4 2.333:5 2.667:8 2.8:14',
+  headScale:   '0:1 1:1.045 1.6:1.07 1.8:1.08 2.067:1.095 2.2:1.135 2.267:1.165 2.333:1.205 2.4:1.26 2.467:1.34 2.533:1.46 2.6:1.62 2.633:1.72 2.7:2.02 2.733:2.23 2.767:2.5',
+  headY:       '0:383 0.4:373 0.8:370 1:369 1.4:369 1.8:367 2:365 2.067:363 2.133:359 2.2:353 2.267:344 2.333:331 2.4:312 2.467:286 2.533:248 2.6:191 2.633:149 2.667:96 2.7:18 2.733:-80 2.767:-230',
+  headBlur:    '0:0 2.6:0 2.633:1 2.667:2 2.7:3 2.733:4.5 2.767:6',
+  headEdge:    '0:0 2:0 2.333:1',                 // sharp-core window narrows: 16–84 % → 20–80 %
+  smearLength: '0:12 1.333:20 2:35 2.333:55 2.6:65 2.767:60',   // horizontal smear length, px
+  wordX:       '2.833:1226 2.867:994 2.9:786 2.933:613 2.967:420 3:230 3.067:-129 3.133:-406 3.2:-588 3.267:-700 3.333:-777 3.4:-847 3.467:-913 3.533:-980 3.6:-1052 3.667:-1121 3.733:-1196 3.8:-1268 3.867:-1345 3.933:-1423 4:-1505',
+  wordOpacity: '2.833:0.08 2.867:0.35 2.933:0.65 3.067:1',
+  wordBlur:    '2.833:35 2.867:20 2.933:8 3.067:0',
+  tintOpacity: '2.833:0.52 3.333:0.65 3.467:0.65 4:0',
+  glow:        '0:0 4:1',
+};
+
+const FPS = 30;
+const F = t => Math.round(t * FPS) / FPS;                       // snap motion.md seconds onto the frame grid
+const keys = s => s.trim().split(/\s+/).map(p => p.split(':').map(Number)).map(([t, v]) => [F(t), v]);
+const $ = s => document.querySelector(s);
+
+const tl = gsap.timeline({ paused: true });
+
+// Piecewise-linear track: one fromTo per key pair; vars(v) maps a value to GSAP vars. Holds after the last key.
+function track(target, str, vars) {
+  const k = typeof str === 'string' ? keys(str) : str;
+  for (let i = 1; i < k.length; i++) {
+    const [t0, v0] = k[i - 1], [t1, v1] = k[i];
+    tl.fromTo(target, vars(v0), { ...vars(v1), duration: t1 - t0, ease: 'none', immediateRender: false }, t0);
+  }
+}
+
+// Text follows the slot: the smear clone and the wordmark colour fills copy the slot text at load;
+// a longer headline shrinks to PARAMS.headlineMaxWidth so it stays on one line.
+const headSlot = $('#t-stage [data-slot="headline"]'), wordSlot = $('#t-stage [data-slot="wordmark"]');
+$('#t-headline .trail .headline-text').textContent = headSlot.textContent;
+for (const kind of ['tone', 'wash', 'tint']) {
+  const clone = document.createElement('div');
+  clone.className = 'wordmark-text fill ' + kind; clone.setAttribute('aria-hidden', 'true');
+  clone.textContent = wordSlot.textContent; $('#t-wordmark').append(clone);
+}
+$('#t-wordmark').style.transform = `scale(${PARAMS.wordmarkScaleX}, 1.03)`;
+function fitHeadline() {
+  const head = $('#t-headline');
+  head.style.setProperty('--headline-size', PARAMS.headlineSize);
+  const w = headSlot.offsetWidth;
+  if (w > PARAMS.headlineMaxWidth) head.style.setProperty('--headline-size', PARAMS.headlineSize * PARAMS.headlineMaxWidth / w);
+}
+fitHeadline();
+
+// S01 · 0.00–4.03 · one shot: push-in on the headline over the plate, punch through, cut to the sliding wordmark
+tl.addLabel('s01-hook', 0);
+track('#t-bg-light', MOTION.glow, v => ({ '--glow-k': v }));
+
+// S01 · 0.00–2.07 · slow push: headline creeps up and grows 0→9.5 %, plate sinks and widens, edges smear
+track('#t-plate', MOTION.plateY, v => ({ top: v }));
+track('#t-plate', MOTION.plateSX, v => ({ scaleX: v }));
+track('#t-plate', MOTION.plateBlur, v => ({ '--blur': v }));
+track('#t-headline', MOTION.headScale, v => ({ scale: v }));
+track('#t-headline', MOTION.headY, v => ({ top: v }));
+track('#t-headline', MOTION.headEdge, v => ({ '--edge': v }));
+track('#t-smear-blur', MOTION.smearLength, v => ({ attr: { stdDeviation: `${v / 2} 0` } }));
+
+// S01 · 2.07–2.80 · punch-zoom knee: scale and lift accelerate, headline exits the top at 2.5x, plate drops out the bottom
+tl.addLabel('s01-knee', F(2.067));
+tl.addLabel('s01-punch', F(2.6));
+track('#t-headline', MOTION.headBlur, v => ({ '--blur': v }));
+tl.set('#t-headline', { visibility: 'hidden' }, F(2.8) - 0.01);    // gone at frame 84
+tl.set('#t-plate', { visibility: 'hidden' }, F(2.833) - 0.01);     // gone at frame 85
+
+// S01 · 2.83–4.03 · hard cut: giant wordmark enters blurred from the right, sharpens by 3.07, then glides left to the end
+tl.addLabel('s01-lyria', F(2.833));
+tl.set('#t-wordmark', { visibility: 'visible' }, F(2.833) - 0.01);
+const wordX = keys(MOTION.wordX);
+track('#t-wordmark', wordX, v => ({ left: v }));
+track('#t-wordmark', wordX.map(([t, x]) => [t, -x / PARAMS.wordmarkScaleX]), v => ({ '--cx': v }));   // colour stays screen-fixed
+track('#t-wordmark', MOTION.wordOpacity, v => ({ opacity: v }));
+track('#t-wordmark', MOTION.wordBlur, v => ({ '--blur': v }));
+tl.addLabel('s01-sharp', F(3.067));
+tl.addLabel('s01-glide', F(3.333));
+track('#t-wordmark', MOTION.tintOpacity, v => ({ '--tint-op': v }));
+tl.addLabel('s01-tint-fade', F(3.467));
+tl.to({}, { duration: 0.001 }, 4.033);
+
+// Register once the web font is in, after re-measuring the headline with the real glyph widths.
+document.fonts.ready.then(() => {
+  fitHeadline();
+  window.__timelines = window.__timelines || {};
+  window.__timelines["turn"] = tl;
+});
+
+})();
+</script>
+</template>

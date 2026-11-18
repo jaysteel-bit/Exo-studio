@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width={{WIDTH}}, height={{HEIGHT}}">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Google Sans"; src: url("assets/fonts/GoogleSans.ttf") format("truetype"); font-weight: 100 900; }
+      :root {
+        --ground: #F5F5F0;
+        --ink: #070906;
+        --font-display: "Google Sans", sans-serif;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: {{WIDTH}}px; height: {{HEIGHT}}px; overflow: hidden; background: var(--ground); }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--ground); font-family: var(--font-display); }
+    </style>
+  </head>
+  <body>
+    <!-- Exo film ({{FORMAT}}). Add beats with `npx hyperframes add <exo-block>` (see the Exo-studio README),
+         then place each one here with data-start / data-duration. -->
+    <div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="{{WIDTH}}" data-height="{{HEIGHT}}">
+    </div>
+  </body>
+</html>

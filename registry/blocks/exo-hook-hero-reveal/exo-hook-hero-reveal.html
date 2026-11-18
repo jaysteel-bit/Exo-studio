@@ -1,0 +1,216 @@
+<template>
+<style>
+@font-face { font-family: "Google Sans"; src: url("assets/fonts/GoogleSans.ttf") format("truetype"); font-weight: 100 900; }
+#root {
+  position: absolute; inset: 0; overflow: hidden; background: #070906;
+  --ground: #E9E9E4;        /* thermal scan's blank light ground (Exo paper, cooled) */
+  --paper: #F5F5F0;         /* title */
+  /* thermal heat ramp, top → bottom of each surface (M1115) */
+  --heat-hot: #E47827;
+  --heat-warm: #E7A944;
+  --heat-pale: #EBEF98;
+  --heat-low: #D87A6F;
+  --heat-edge: #F2F0BD;
+  --heat-rim: #EDF0A0;
+  --island-1: #E496DE;
+  --island-2: #A078E6;
+  --island-3: #E79174;
+  --thermal-1: #B198DA;
+  --thermal-2: #9570DF;
+  --thermal-3: #CB87DE;
+  --thermal-4: #ED651C;
+  --thermal-5: #BF63BD;
+  --thermal-6: #9570E6;
+  --thermal-7: #A16CC3;
+  --thermal-8: #ECB7CF;
+  --thermal-9: #EFE1A7;
+  --font-ui: "Google Sans", sans-serif;
+}
+#hook-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; }
+#hook-stage .layer { position: absolute; }
+#hook-stage .full { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+#hook-stage img.fill { display: block; width: 100%; height: 100%; object-fit: fill; }
+
+/* wide shot: the hero photo (M1115 footage box) + scan canvas */
+#hook-footage { left: -247px; top: -208px; width: 2415px; height: 1395px; transform-origin: 0 0; }
+#hook-thermal { filter: blur(2px); }
+/* the page's own hero scrim, strongest under the copy (left + low) */
+#hook-scrim { background:
+  linear-gradient(0deg, rgba(7, 9, 6, 0.7) 0%, rgba(7, 9, 6, 0) 46%),
+  linear-gradient(90deg, rgba(7, 9, 6, 0.9) 0%, rgba(7, 9, 6, 0.7) 30%, rgba(7, 9, 6, 0.25) 58%, rgba(7, 9, 6, 0) 100%); }
+
+/* medium shot after the cut: a closer framing of the same photo */
+#hook-overscan { filter: blur(4px); }
+#hook-medium-camera { left: -10px; top: 6px; transform-origin: 960px 555px; }
+#hook-medium-crop { left: -302px; top: -74px; width: 2534px; height: 1426px; }
+
+/* the line: steps in like M1115's screen, then holds dead still across the cut */
+#hook-title { left: 150px; top: 610px; width: 900px; }
+#hook-title-in { opacity: 0.1; }
+.hook-line { font-family: var(--font-ui); font-weight: 400; font-size: 112px; line-height: 1.04; letter-spacing: -0.035em; color: var(--paper); white-space: nowrap; }
+.hook-line em { font-family: Georgia, "Times New Roman", serif; font-style: italic; font-weight: 400; letter-spacing: -0.02em; }
+</style>
+
+<div data-hf-id="hf-ktv8" id="root" data-composition-id="hook" data-width="1920" data-height="1080">
+  <div data-hf-id="hf-be7t" id="hook-stage">
+    <!-- wide shot 0–2.24: the hero photo under the scan -->
+    <div data-hf-id="hf-mh8m" id="hook-footage" class="layer">
+      <img data-hf-id="hf-rg5p" id="hook-photo" class="clip fill" src="assets/brand/runner-16x9.jpg" alt="runner at golden hour" data-start="0" data-duration="3.6" data-track-index="0">
+    </div>
+
+    <!-- medium shot 2.24–3.60: blurred overscan, then the camera group -->
+    <img data-hf-id="hf-4mt2" id="hook-overscan" class="clip full fill" src="assets/brand/runner-16x9.jpg" alt="" data-start="2.24" data-duration="1.36" data-track-index="2">
+    <div data-hf-id="hf-oxrv" id="hook-medium" class="clip full" data-start="2.24" data-duration="1.36" data-track-index="3">
+      <div data-hf-id="hf-kxas" id="hook-medium-camera" class="full">
+        <div data-hf-id="hf-mo77" id="hook-medium-crop" class="layer"><img data-hf-id="hf-jwze" class="fill" src="assets/brand/runner-16x9.jpg" alt="runner, closer"></div>
+      </div>
+    </div>
+
+    <div data-hf-id="hf-sgtp" id="hook-scrim" class="full"></div>
+    <canvas data-hf-id="hf-p0fo" id="hook-thermal" class="clip full" width="960" height="540" data-start="0" data-duration="3.6" data-track-index="1"></canvas>
+
+    <!-- the line, from the page's hero: "The ambition is yours." -->
+    <div data-hf-id="hf-3a59" id="hook-title" class="layer clip" data-start="1.28" data-duration="2.32" data-track-index="4">
+      <div data-hf-id="hf-xlvv" id="hook-title-in">
+        <div data-hf-id="hf-5sow" class="hook-line">The ambition</div>
+        <div data-hf-id="hf-4hzw" class="hook-line">is <em data-hf-id="hf-0b85">yours</em></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+// ---- PARAMS (M1115) ----
+const PARAMS = {
+  thermalPalette: [[0, '--thermal-1'], [0.20, '--thermal-2'], [0.40, '--thermal-3'], [0.80, '--thermal-4'],
+                   [1.00, '--thermal-5'], [1.20, '--thermal-6'], [1.80, '--thermal-7'], [2.04, '--thermal-8'], [2.20, '--thermal-9']],
+  groundFade: [1.88, 2.24],
+  rimAlpha: 0.45,
+};
+
+// Surfaces of the hero photo, traced on its 1920x1080 framing, then mapped into the footage box
+// (M1115 traces on the displayed footage). Windows are M1115's: the subject heats first and clears first, the
+// background heats last and clears last.
+const BOX = (x, y) => [-247 + x * 2415 / 1920, -208 + y * 1395 / 1080];
+const RAW = [
+  { name: 'background', on: [0.36, 0.72], off: [1.80, 2.24], islands: 60,  pts: [[0,0],[1920,0],[1920,1080],[0,1080]] },
+  { name: 'sky',        on: [0.16, 0.28], off: [1.36, 1.56], islands: 14,  pts: [[0,0],[1920,0],[1920,150],[0,230]] },
+  { name: 'ground',     on: [0.04, 0.20], off: [1.12, 1.48], islands: 180, pts: [[0,800],[400,760],[800,780],[1400,860],[1400,1080],[0,1080]] },
+  { name: 'left_rock',  on: [0.04, 0.16], off: [1.16, 1.40], islands: 40,  pts: [[200,0],[470,0],[460,120],[360,200],[330,350],[300,500],[260,640],[180,760],[40,800],[0,700],[0,420],[120,380],[200,250],[230,100]] },
+  { name: 'right_rock', on: [0.04, 0.16], off: [1.16, 1.44], islands: 120, pts: [[1920,320],[1920,1080],[1400,1080],[1440,900],[1480,700],[1560,520],[1680,400]] },
+  { name: 'streak',     on: [0.16, 0.24], off: [1.44, 1.64], islands: 0,   pts: [[420,760],[780,700],[800,740],[440,800]] },
+  { name: 'streak',     on: [0.16, 0.24], off: [1.44, 1.64], islands: 0,   pts: [[1000,880],[1360,850],[1380,890],[1020,930]] },
+  { name: 'runner',     on: [-0.04, 0.12], off: [1.04, 1.28], islands: 220, grow: [0, 0.16],
+    pts: [[920,104],[1000,110],[1033,153],[1100,250],[1153,333],[1153,420],[1150,610],[1170,640],[1250,690],[1320,690],[1385,665],[1395,690],
+          [1380,800],[1340,810],[1320,745],[1250,740],[1100,740],[1050,680],[990,690],[955,860],[915,870],[880,800],[850,700],[880,600],
+          [893,560],[875,510],[880,450],[920,410],[905,270],[880,225],[835,175],[880,150]] },
+];
+const RUNNER_C = BOX(0, 490)[1];   // the subject's silhouette starts flattened about its middle (M1115's 696/744)
+const SURFACES = RAW.map(s => ({ ...s, pts: s.pts.map(([x, y]) => BOX(x, y)) }));
+SURFACES.forEach(s => {
+  const xs = s.pts.map(p => p[0]), ys = s.pts.map(p => p[1]);
+  s.box = [Math.min(...xs), Math.min(...ys), Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)];
+});
+
+const rootEl = document.getElementById('hook-stage').parentElement;
+const css = getComputedStyle(rootEl);
+const rgbOf = v => { const h = css.getPropertyValue(v).trim(); return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); };
+const rgba = (c, a = 1) => `rgba(${c.map(Math.round).join(',')},${a})`;
+const C = { ground: rgbOf('--ground'), hot: rgbOf('--heat-hot'), warm: rgbOf('--heat-warm'), pale: rgbOf('--heat-pale'),
+            low: rgbOf('--heat-low'), edge: rgbOf('--heat-edge'), rim: rgbOf('--heat-rim'),
+            islands: ['--island-1', '--island-2', '--island-3'].map(rgbOf) };
+const PALETTE = PARAMS.thermalPalette.map(([t, v]) => [t, rgbOf(v)]);
+
+const clamp01 = x => Math.max(0, Math.min(1, x));
+const ramp = (t, [a, b]) => clamp01((t - a) / (b - a));
+const hash = i => ((Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 1 + 1) % 1;
+function paletteAt(t) {
+  for (let i = 0; i < PALETTE.length - 1; i++) if (t <= PALETTE[i + 1][0]) {
+    const [t0, a] = PALETTE[i], [t1, b] = PALETTE[i + 1], k = clamp01((t - t0) / (t1 - t0));
+    return a.map((x, j) => x + (b[j] - x) * k);
+  }
+  return PALETTE[PALETTE.length - 1][1];
+}
+
+const g = document.getElementById('hook-thermal').getContext('2d');
+const poly = pts => { g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); };
+
+function drawThermal(t) {
+  g.setTransform(0.5, 0, 0, 0.5, 0, 0);
+  g.globalCompositeOperation = 'source-over';
+  g.clearRect(0, 0, 1920, 1080);
+  g.globalAlpha = 1 - ramp(t, PARAMS.groundFade);
+  g.fillStyle = rgba(C.ground); g.fillRect(0, 0, 1920, 1080);
+  const body = rgba(paletteAt(t));
+  SURFACES.forEach((s, n) => {
+    let pts = s.pts;
+    if (s.grow) { const k = ramp(t, s.grow); pts = pts.map(([x, y]) => [x, RUNNER_C + 48 + (y - RUNNER_C) * (0.62 + 0.38 * k) - 48 * k]); }
+    g.save(); poly(pts); g.clip();
+    g.globalAlpha = 1; g.globalCompositeOperation = 'destination-out'; g.fillRect(0, 0, 1920, 1080);
+    g.globalCompositeOperation = 'source-over';
+    const clear = ramp(t, s.off), heat = ramp(t, s.on);
+    g.globalAlpha = 1 - clear; g.fillStyle = rgba(C.ground); g.fillRect(0, 0, 1920, 1080);
+    g.globalAlpha = (1 - clear) * heat;
+    const [bx, by, bw, bh] = s.box, grad = g.createLinearGradient(bx, by, bx, by + bh);
+    [[0, C.hot], [0.13, C.warm], [0.19, C.pale]].forEach(([at, c]) => grad.addColorStop(at, rgba(c)));
+    grad.addColorStop(0.25, body); grad.addColorStop(0.78, body);
+    grad.addColorStop(0.94, rgba(C.low)); grad.addColorStop(1, rgba(C.edge));
+    g.fillStyle = grad; g.fillRect(bx, by, bw, bh);
+    for (let i = 0; i < s.islands; i++) {
+      const x = bx + hash(i + n * 17) * bw, y = by + hash(i + 23 + n * 11) * bh, r = 12 + hash(i + 49) * 46;
+      const c = C.islands[i % 3], rg = g.createRadialGradient(x, y, 0, x, y, r);
+      rg.addColorStop(0, rgba(c, 187 / 255)); rg.addColorStop(0.35, rgba(c, 136 / 255)); rg.addColorStop(1, rgba(c, 0));
+      g.fillStyle = rg; g.fillRect(x - r, y - r, r * 2, r * 2);
+    }
+    if (s.grow) { g.globalAlpha = (1 - clear) * heat * PARAMS.rimAlpha; g.strokeStyle = rgba(C.rim); g.lineWidth = 20; poly(pts); g.stroke(); }
+    g.restore();
+  });
+  g.globalAlpha = 1;
+}
+
+// ---- timeline (M1115) ----
+const tl = gsap.timeline({ paused: true });
+function track(target, prop, keys) {
+  tl.set(target, { [prop]: keys[0][1] }, 0);
+  for (let i = 1; i < keys.length; i++) {
+    const [t0] = keys[i - 1], [t1, v] = keys[i];
+    if (t1 > t0) tl.to(target, { [prop]: v, duration: t1 - t0, ease: 'none' }, t0);
+  }
+}
+
+tl.addLabel('s01-room-reveal', 0);
+tl.addLabel('thermal-on', 0.04);
+tl.addLabel('thermal-clear', 1.04);
+tl.addLabel('screen-on', 1.28);
+tl.addLabel('drift', 1.40);
+tl.addLabel('cut-medium', 2.24);
+tl.addLabel('settle', 3.56);
+
+// 0.00–2.24 · the scan: runner heats first, the rest follows, then each clears to the photo
+const scan = { t: 0 };
+tl.to(scan, { t: 2.24, duration: 2.24, ease: 'none', onUpdate: () => drawThermal(scan.t) }, 0);
+drawThermal(0);
+
+// 1.40–2.20 · wide photo drifts back (slow pull-back), linear
+const footage = document.getElementById('hook-footage');
+track(footage, 'x',      [[0, 0], [1.40, 0], [2.20, 55]]);
+track(footage, 'y',      [[0, 0], [1.40, 0], [2.20, 18]]);
+track(footage, 'scaleX', [[0, 1], [1.40, 1], [2.20, 2310 / 2415]]);
+track(footage, 'scaleY', [[0, 1], [1.40, 1], [2.20, 1355 / 1395]]);
+
+// 1.28–1.40 · the line steps in over 3 frames (M1115's screen steps), then holds dead still
+const title = document.getElementById('hook-title-in');
+track(title, 'opacity', [[1.28, 0.1], [1.32, 0.55], [1.36, 0.85], [1.40, 1]]);
+
+// 2.24–3.56 · hard cut to the closer framing: one-frame scale snap, then a slow linear push-in
+const cam = document.getElementById('hook-medium-camera');
+track(cam, 'scaleX', [[2.24, 0.92004], [2.28, 0.984], [3.56, 1.045]]);
+track(cam, 'scaleY', [[2.24, 0.935], [2.28, 1], [3.56, 1.062]]);
+
+tl.set({}, {}, 3.6);
+window.__timelines = window.__timelines || {};
+window.__timelines["hook"] = tl;
+})();
+</script>
+</template>

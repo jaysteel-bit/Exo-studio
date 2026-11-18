@@ -1,0 +1,515 @@
+<template>
+<style>
+@font-face { font-family: "Google Sans"; src: url("assets/fonts/GoogleSans.ttf") format("truetype"); font-weight: 100 900; }
+#root {
+  --bg: #EFEFE9;            
+  --plate: #F5F5F0;         
+  --surface: #FFFFFF;       
+  --soft-plate: #FAFAF7;    
+  --ink: #070906;           
+  --muted: #5C605E;         
+  --line: #D4D4D4;          
+  --line-soft: #D8D8D8;     
+  --rule: #E5E5E5;          
+  --sweep: #EEEEEE;         
+  --disk-edge: #D6D6D6;     
+  --dash: #B7B7B7;          
+  --node: #999999;          
+  --ring: #888888;          
+  --ring-dark: #777777;     
+  --icon-line: #AAAAAA;     
+  --accent: #10B981;        
+  --toggle-off: #C7C7C9;
+  --toggle-on: #10B981;
+  --cta: #070906;           
+  --cta-ink: #F5F5F0;
+  --shadow: #000000;
+  --end-fill: #F5F5F5;      
+  --end-line: #DDDDDD;
+  --chassis: #414141;       
+  --chassis-hi: #B1B1B1;    
+  --chassis-mid: #6C6C6C;
+  --chassis-lo: #3A3A3A;
+  --chassis-pale: #A0A0A0;
+  --chassis-deep: #151515;
+  --bezel: #080808;
+  --button: #555555;        
+  --lens: #071122;          
+  --lens-glint: #292156;
+  --glass-rim: #FFF8ED;     
+  --glass-edge: #D5D4DE;
+  --glass-grey: #DADADA;
+  --glass-burgundy: #512433;
+  --glass-lavender: #B6B6EF;
+  --font-display: "Google Sans", sans-serif;
+  --font-ui: "Google Sans", sans-serif;
+}
+#root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+#p-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; font-family: var(--font-ui); color: var(--ink); }
+#p-stage div, #p-stage span, #p-stage img, #p-stage svg { position: absolute; box-sizing: border-box; }
+#p-stage svg { overflow: visible; fill: none; stroke: var(--ink); }
+:where(#p-stage) .grp { left: 0; top: 0; transform-origin: 0 0; }
+:where(#p-stage) .t { white-space: nowrap; }
+:where(#p-stage) .circle { border-radius: 50%; }
+:where(#p-stage) .dash { width: 42px; height: 1px; background: var(--dash); }
+:where(#p-stage) .node { width: 32px; height: 32px; border: 1px solid var(--node); background: var(--bg); }
+#p-pill { left: 320px; top: 424px; width: 1280px; height: 230px; border-radius: 50px; background: var(--plate); box-shadow: 0 12px 80px color-mix(in srgb, var(--shadow) 7%, transparent); }
+#p-pill-number { left: 0; top: 69px; width: 100%; height: 96px; }
+#p-pill-number span { top: 0; font: 500 80px/96px var(--font-display); text-align: center; }
+:where(#p-stage) .copyico { width: 49px; height: 53px; border: 6px solid var(--icon-line); border-radius: 8px; }
+#p-dial { width: 1760px; height: 1760px; }
+#p-dial-plate { inset: 0; border: 1px solid var(--ring-dark); background: var(--bg); }
+#p-dial-inner { left: 124px; top: 124px; width: 1512px; height: 1512px; border: 1px solid var(--ring); }
+#p-rotor { inset: 0; transform-origin: 50% 50%; }
+:where(#p-stage) .arc { inset: 0; }
+:where(#p-stage) .arc span { width: 40px; height: 44px; font: 600 32px/44px var(--font-ui); text-align: center; }
+#p-phone { width: 920px; height: 1940px; }
+#p-phone .layer { border-radius: var(--r); }
+:where(#p-stage) .side-btn { left: -6px; width: 8px; border-radius: 4px; background: var(--button); }
+#p-chat { left: 0; top: 0; width: 920px; height: 1940px; clip-path: inset(30px round 155px); }
+#p-chat .t { font: 400 32px/48px var(--font-ui); }
+:where(#p-stage) .avatar.ini { display: flex; align-items: center; justify-content: center; font: 600 40px/1 var(--font-ui); }
+:where(#p-stage) .avatar { width: 118px; height: 118px; border-radius: 50%; object-fit: cover; }
+:where(#p-stage) .row { left: 0; width: 920px; height: 140px; }
+:where(#p-stage) .row .name { left: 218px; top: 8px; display: flex; align-items: center; gap: 10px; height: 44px; }
+:where(#p-stage) .row .name span { position: static; font: 600 32px/44px var(--font-ui); white-space: nowrap; }
+:where(#p-stage) .badge { position: relative !important; flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); }
+:where(#p-stage) .badge svg { left: 3px; top: 3px; width: 20px; height: 20px; stroke: var(--cta-ink) !important; stroke-width: 2.4; }
+:where(#p-stage) .row .msg { left: 218px; top: 58px; width: 584px; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+:where(#p-stage) .row .when { right: 64px; top: 8px; font: 400 26px/38px var(--font-ui) !important; color: var(--muted); }
+#p-popup { width: 440px; height: 836px; --pw: 142; --ph: 82; }
+#p-psurf { right: 0; top: 0; width: calc(var(--pw) * 1px); height: calc(var(--ph) * 1px); background: var(--surface); border: 1.5px solid var(--line); border-radius: 70px;
+  box-shadow: 0 8px 50px color-mix(in srgb, var(--shadow) 8%, transparent); }
+#p-pclip { left: 0; top: 0; width: 440px; height: 836px; clip-path: inset(0 0 calc((836 - var(--ph)) * 1px) calc((440 - var(--pw)) * 1px)); }
+:where(#p-stage) .mrow { left: 0; top: 0; width: 440px; height: 60px; }
+:where(#p-stage) .mrow svg { left: 51px; top: 2px; width: 44px; height: 44px; stroke-width: 2.2; }
+:where(#p-stage) .mrow .t { left: 124px; top: -1px; font: 400 32px/48px var(--font-ui); }
+:where(#p-stage) .mdiv { left: 32px; width: 389px; height: 1px; background: var(--rule); }
+:where(#p-stage) .kdot { width: 6.16px; height: 6.16px; border-radius: 50%; background: var(--ink); }
+#p-sweep { left: 0; top: 503px; width: 800px; height: 92px; background: linear-gradient(90deg, transparent, var(--sweep) 28%, var(--sweep) 68%, transparent); }
+#p-sheet { width: 749px; height: 725px; }
+#p-sheet-surface { inset: 0; background: var(--surface); border-radius: 74px 74px 113px 113px; box-shadow: 0 8px 40px color-mix(in srgb, var(--shadow) 4%, transparent); }
+:where(#p-stage) .center { text-align: center; }
+#p-reels { left: 0; top: 312px; width: 749px; height: 78px; }
+:where(#p-stage) .reel { top: 0; width: 50px; height: 78px; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, black 22%, black 78%, transparent); mask-image: linear-gradient(transparent, black 22%, black 78%, transparent); }
+:where(#p-stage) .reel span, :where(#p-stage) .fixed { left: 0; width: 50px; font: 550 44px/55px var(--font-display); text-align: center; }
+:where(#p-stage) .strip { left: 0; top: 0; width: 50px; height: 78px; }
+#p-track { left: 563px; top: 468px; width: 122px; height: 55px; border-radius: 28px; background: var(--toggle-off); overflow: hidden; }
+#p-track-on { inset: 0; background: var(--toggle-on); opacity: 0; }
+#p-thumb { left: 0; top: 0; width: 72px; height: 47px; border-radius: 24px; background: var(--surface); box-shadow: 0 2px 3px color-mix(in srgb, var(--shadow) 7%, transparent); }
+#p-glass { width: 116px; height: 76px; }
+#p-glass-body { inset: 0; border-radius: 38px; box-shadow: 0 12px 18px color-mix(in srgb, var(--shadow) 9%, transparent);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--glass-grey) 73%, transparent), color-mix(in srgb, var(--surface) 27%, transparent) 23%, transparent 52%, color-mix(in srgb, var(--surface) 47%, transparent) 78%, color-mix(in srgb, var(--surface) 73%, transparent)); }
+:where(#p-stage) .glint { height: 9px; border-radius: 4px; filter: blur(2px); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--surface) var(--a), transparent) 25%, color-mix(in srgb, var(--surface) var(--a), transparent) 85%, transparent); }
+:where(#p-stage) .btn { top: 588px; height: 96px; border-radius: 48px; }
+#p-refresh { left: 48px; width: 315px; background: var(--bg); display: flex; align-items: center; gap: 13px; padding-left: 64px; }
+#p-refresh svg, #p-refresh span { position: static; flex: none; }
+#p-share { left: 386px; width: 314px; height: 94px; border-radius: 47px; background: var(--cta); color: var(--cta-ink); display: flex; align-items: center; justify-content: center; transform-origin: 50% 50%; }
+#p-share span { position: static; }
+#p-ending { left: 906px; top: 486px; width: 108px; height: 108px; transform-origin: 50% 50%; }
+#p-ending div { border: 1px solid var(--end-line); background: var(--end-fill); }
+</style>
+<div data-hf-id="hf-s4mz" id="root" data-composition-id="proof" data-width="1920" data-height="1080">
+<div data-hf-id="hf-e3gi" id="p-stage">
+
+  <!-- background: dashed rules + nodes + left ring (0–0.37 s), number pill (0–0.5 s), rotating dial (0–3.0 s) -->
+  <div data-hf-id="hf-zgc4" id="p-bg" class="grp" style="width:1920px;height:1080px">
+    <div data-hf-id="hf-7jju" id="p-dashes" class="grp"></div>
+    <div data-hf-id="hf-v7c8" id="p-node0" class="node circle" style="left:0;top:264px"></div>
+    <div data-hf-id="hf-idto" id="p-node1" class="node circle" style="left:0;top:784px"></div>
+    <div data-hf-id="hf-zvdh" id="p-left-ring" class="circle" style="left:-252px;top:322px;width:436px;height:436px;border:1px solid var(--ring);background:var(--bg)"></div>
+    <div data-hf-id="hf-smv5" id="p-pill">
+      <div data-hf-id="hf-ibz3" id="p-pill-number" class="t" data-slot="teaser-number">3 0 : 0 0</div>
+      <div data-hf-id="hf-4pvc" class="copyico" style="left:1141px;top:80px"></div>
+      <div data-hf-id="hf-eh3s" class="copyico" style="left:1158px;top:98px;background:var(--plate)"></div>
+    </div>
+    <div data-hf-id="hf-rrnc" id="p-dial" class="grp">
+      <div data-hf-id="hf-r7jy" id="p-dial-plate" class="circle"></div>
+      <div data-hf-id="hf-uy9y" id="p-dial-inner" class="circle"></div>
+      <div data-hf-id="hf-zj98" id="p-rotor">
+        <div data-hf-id="hf-5rg7" class="arc" id="p-arc-left" data-slot="dial-digits-left">8 7 7 6 3 2 0 2 3 9</div>
+        <div data-hf-id="hf-6aaa" class="arc" id="p-arc-right" data-slot="dial-digits-right">2 4 4 4 4 6 9 6 · 4</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- phone: chassis layers, chat list, scrim -->
+  <div data-hf-id="hf-0fre" id="p-phone" class="grp">
+    <!-- chassis: one drawing (layers from M1174: rim, two metal gradients, bezel, glass edge, screen) -->
+    <svg data-hf-id="hf-6i6h" id="p-chassis" style="left:0;top:0;width:920px;height:1940px;stroke:none;filter:drop-shadow(0 8px 13px color-mix(in srgb, var(--shadow) 7%, transparent))" viewBox="0 0 920 1940">
+      <defs data-hf-id="hf-mh0t">
+        <linearGradient data-hf-id="hf-u4kd" id="p-metal-h" x1="0" x2="1" y1="0" y2="0">
+          <stop data-hf-id="hf-8fue" offset="0" style="stop-color:var(--chassis-lo)"/><stop data-hf-id="hf-ka3v" offset="0.025" style="stop-color:var(--chassis-hi)"/>
+          <stop data-hf-id="hf-vix0" offset="0.07" style="stop-color:var(--chassis-mid)"/><stop data-hf-id="hf-2i3e" offset="0.5" style="stop-color:var(--chassis-mid)"/>
+          <stop data-hf-id="hf-idg8" offset="0.94" style="stop-color:var(--chassis-pale)"/><stop data-hf-id="hf-ro9x" offset="1" style="stop-color:var(--chassis-lo)"/>
+        </linearGradient>
+        <linearGradient data-hf-id="hf-6mrf" id="p-metal-v" x1="0" x2="0" y1="0" y2="1">
+          <stop data-hf-id="hf-kq5d" offset="0" style="stop-color:var(--chassis-mid)"/><stop data-hf-id="hf-xcq7" offset="0.02" style="stop-color:var(--chassis-pale)"/>
+          <stop data-hf-id="hf-cpbz" offset="0.1" style="stop-color:var(--chassis-lo)"/><stop data-hf-id="hf-hp4u" offset="0.65" style="stop-color:var(--chassis-deep)"/>
+          <stop data-hf-id="hf-ta62" offset="0.96" style="stop-color:var(--chassis-mid)"/><stop data-hf-id="hf-07p5" offset="1" style="stop-color:var(--chassis-lo)"/>
+        </linearGradient>
+      </defs>
+      <rect data-hf-id="hf-1fpr" x="0" y="0" width="920" height="1940" rx="185" style="fill:var(--chassis)"/>
+      <rect data-hf-id="hf-g7p2" x="3" y="3" width="914" height="1934" rx="182" style="fill:url(#p-metal-h)"/>
+      <rect data-hf-id="hf-3iss" x="8" y="8" width="904" height="1924" rx="177" style="fill:url(#p-metal-v)"/>
+      <rect data-hf-id="hf-q1pa" x="15" y="15" width="890" height="1910" rx="170" style="fill:var(--bezel)"/>
+      <rect data-hf-id="hf-qm4y" x="23" y="23" width="874" height="1894" rx="162" style="fill:var(--cta)"/>
+      <rect data-hf-id="hf-8h0r" x="30" y="30" width="860" height="1880" rx="155" style="fill:var(--surface)"/>
+    </svg>
+    <div data-hf-id="hf-8apw" class="side-btn" style="top:392px;height:90px"></div>
+    <div data-hf-id="hf-38v0" class="side-btn" style="top:550px;height:135px"></div>
+    <div data-hf-id="hf-6bwo" class="side-btn" style="top:734px;height:135px"></div>
+    <div data-hf-id="hf-vejr" class="side-btn" style="left:918px;top:595px;width:7px;height:200px;border-radius:3px"></div>
+    <div data-hf-id="hf-ki8i" id="p-chat">
+      <span data-hf-id="hf-3ya2" class="t" style="left:136px;top:75px;font:650 36px/46px var(--font-ui)" data-slot="status-time" data-fit="150">7:30</span>
+      <div data-hf-id="hf-42au" style="left:327px;top:61px;width:266px;height:78px;border-radius:42px;background:var(--cta)"></div>
+      <div data-hf-id="hf-2dsi" class="circle" style="left:527px;top:85px;width:24px;height:24px;background:var(--lens)"></div>
+      <div data-hf-id="hf-irya" class="circle" style="left:534px;top:91px;width:9px;height:9px;background:var(--lens-glint)"></div>
+      <div data-hf-id="hf-8jsn" style="left:657px;top:105px;width:7px;height:6px;border-radius:2px;background:var(--ink)"></div>
+      <div data-hf-id="hf-bih0" style="left:668px;top:99px;width:7px;height:12px;border-radius:2px;background:var(--ink)"></div>
+      <div data-hf-id="hf-6swe" style="left:679px;top:93px;width:7px;height:18px;border-radius:2px;background:var(--ink)"></div>
+      <div data-hf-id="hf-04j5" style="left:690px;top:87px;width:7px;height:24px;border-radius:2px;background:var(--ink)"></div>
+      <svg data-hf-id="hf-73dg" style="left:714px;top:82px;width:35px;height:35px;stroke-width:2.3" viewBox="0 0 24 24"><path data-hf-id="hf-ruwt" d="M 1 7 Q 12 -2 23 7 M 5 12 Q 12 5 19 12 M 9 16 Q 12 13 15 16 M 12 20 L 12 21"/></svg>
+      <div data-hf-id="hf-zh5r" style="left:766px;top:84px;width:52px;height:25px;border-radius:5px;border:2px solid var(--ring);background:var(--surface)"></div>
+      <div data-hf-id="hf-jtmx" style="left:770px;top:88px;width:44px;height:17px;border-radius:3px;background:var(--ink)"></div>
+      <div data-hf-id="hf-b67m" style="left:820px;top:91px;width:3px;height:11px;border-radius:1px;background:var(--ring)"></div>
+      <div data-hf-id="hf-uhjk" class="avatar ini" style="left:66px;top:174px;width:70px;height:70px;background:var(--chassis-lo)"></div>
+      <span data-hf-id="hf-3e4z" class="t center" style="left:320px;top:178px;width:280px;font:650 38px/54px var(--font-ui)" data-slot="screen-title" data-fit="280">Inbox</span>
+      <div data-hf-id="hf-fhvi" id="p-all-btn" style="right:76px;top:177px;height:64px;border:2px solid var(--line-soft);border-radius:32px;background:var(--surface);display:flex;align-items:center;gap:13px;padding:0 23px">
+        <span data-hf-id="hf-1bpu" class="t" style="position:static;font:500 30px/38px var(--font-ui)" data-slot="filter-label" data-fit="120">All</span>
+        <svg data-hf-id="hf-bw6p" style="position:static;width:20px;height:20px;stroke-width:2" viewBox="0 0 24 24"><path data-hf-id="hf-5ckt" d="M 4 8 L 12 16 L 20 8"/></svg>
+      </div>
+      <div data-hf-id="hf-i5i9" style="left:66px;top:272px;width:790px;height:86px;border-radius:43px;background:var(--bg);display:flex;align-items:center;justify-content:center;gap:27px">
+        <svg data-hf-id="hf-i0gn" style="position:static;width:32px;height:32px;stroke:var(--muted);stroke-width:2.2" viewBox="0 0 24 24"><path data-hf-id="hf-fffk" d="M 17 17 L 23 23 M 19 10 A 9 9 0 1 1 1 10 A 9 9 0 1 1 19 10"/></svg>
+        <span data-hf-id="hf-hhsb" class="t" style="position:static;font:400 36px/58px var(--font-ui);color:var(--muted)" data-slot="search-placeholder" data-fit="600">Search</span>
+      </div>
+      <div data-hf-id="hf-3fch" id="p-rows" class="grp">
+        <div data-hf-id="hf-q4hw" class="row" style="top:410px">
+          <div data-hf-id="hf-pgwg" class="avatar ini" style="left:66px;top:0;background:#2F3031;color:#F5F5F0">LT</div>
+          <div data-hf-id="hf-mwtd" class="name"><span data-hf-id="hf-a662" data-slot="chat-name-1" data-fit="520">Leadership team</span></div>
+          <span data-hf-id="hf-5p43" class="t msg" style="font-weight:600;color:var(--ink)" data-slot="chat-preview-1">Q3 plan needs your sign-off</span>
+          <span data-hf-id="hf-kjq0" class="t when" data-slot="chat-time-1" data-fit="60">9m</span>
+          <div data-hf-id="hf-wl15" class="circle" style="left:827px;top:69px;width:14px;height:14px;background:var(--accent)"></div>
+        </div>
+        <div data-hf-id="hf-prok" class="row" style="top:582px">
+          <div data-hf-id="hf-rby9" class="avatar ini" style="left:66px;top:0;background:#5C605E;color:#F5F5F0">B</div>
+          <div data-hf-id="hf-n3jp" class="name"><span data-hf-id="hf-bv4b" data-slot="chat-name-2" data-fit="520">Board</span></div>
+          <span data-hf-id="hf-nzrc" class="t msg" data-slot="chat-preview-2">Can we see the deck before Friday?</span>
+          <span data-hf-id="hf-fy0k" class="t when" data-slot="chat-time-2" data-fit="60">1h</span>
+        </div>
+        <div data-hf-id="hf-v5li" class="row" style="top:760px">
+          <div data-hf-id="hf-hche" class="avatar ini" style="left:66px;top:0;background:#B5B8B3;color:#070906">M</div>
+          <div data-hf-id="hf-oags" class="name"><span data-hf-id="hf-akg4" data-slot="chat-name-3" data-fit="520">Maya</span></div>
+          <span data-hf-id="hf-2ty0" class="t msg" data-slot="chat-preview-3">Still on for our anniversary?</span>
+          <span data-hf-id="hf-t96m" class="t when" data-slot="chat-time-3" data-fit="60">2h</span>
+        </div>
+        <div data-hf-id="hf-ieut" class="row" style="top:932px">
+          <div data-hf-id="hf-2ag9" class="avatar ini" style="left:66px;top:0;background:#D8D8D2;color:#070906">TD</div>
+          <div data-hf-id="hf-nw5r" class="name"><span data-hf-id="hf-gpg8" data-slot="chat-name-4" data-fit="520">Travel desk</span></div>
+          <span data-hf-id="hf-oism" class="t msg" data-slot="chat-preview-4">Which dates work for Lisbon?</span>
+          <span data-hf-id="hf-eli8" class="t when" data-slot="chat-time-4" data-fit="60">3h</span>
+          <svg data-hf-id="hf-nxn3" style="left:836px;top:62px;width:16px;height:22px;stroke:var(--muted);stroke-width:1.5" viewBox="0 0 24 24" preserveAspectRatio="none"><path data-hf-id="hf-fr91" d="M 9 1 H 16 L 15 10 L 20 16 H 4 L 9 10 Z M 12 16 V 24"/></svg>
+        </div>
+      </div>
+    </div>
+    <div data-hf-id="hf-m6rh" id="p-scrim" class="layer" style="inset:30px;--r:155px;background:var(--shadow);opacity:0"></div>
+  </div>
+
+  <!-- isolation disk: grows between phone and popup (2.13–4.60 s) -->
+  <div data-hf-id="hf-b9mz" id="p-disk" class="circle" style="border:1px solid var(--disk-edge);background:var(--bg)"></div>
+
+  <!-- number sheet (4.60 s →), under the leaving popup -->
+  <div data-hf-id="hf-js0z" id="p-sheet" class="grp">
+    <div data-hf-id="hf-r8ln" id="p-sheet-surface"></div>
+    <span data-hf-id="hf-8tac" class="t center" style="left:20px;top:44px;width:709px;font:550 36px/50px var(--font-display)" data-slot="sheet-title" data-fit="709">One partner for business and life</span>
+    <span data-hf-id="hf-v09r" class="t center" style="left:0;top:168px;width:749px;font:400 28px/40px var(--font-ui);color:var(--muted)" data-slot="sheet-line-1" data-fit="700">A weekly 30-minute review in which</span>
+    <span data-hf-id="hf-h8kv" class="t center" style="left:0;top:208px;width:749px;font:400 28px/40px var(--font-ui);color:var(--muted)" data-slot="sheet-line-2" data-fit="700">you approve the work.</span>
+    <div data-hf-id="hf-gs52" style="left:24px;top:273px;width:700px;height:150px;border-radius:60px;background:var(--soft-plate);filter:blur(12px)"></div>
+    <div data-hf-id="hf-r9qj" style="left:49px;top:294px;width:650px;height:108px;border-radius:33px;background:var(--bg)"></div>
+    <div data-hf-id="hf-7y2b" id="p-reels"><span data-hf-id="hf-09vx" id="p-number-final" class="t" data-slot="number-final" style="visibility:hidden">30:00</span></div>
+    <span data-hf-id="hf-j8cg" class="t" style="left:63px;top:473px;font:500 29px/48px var(--font-ui)" data-slot="toggle-label" data-fit="440">You retain the decisions</span>
+    <div data-hf-id="hf-cz3h" id="p-track"><div data-hf-id="hf-6b0t" id="p-track-on"></div></div>
+    <div data-hf-id="hf-e8mo" id="p-thumb"></div>
+    <div data-hf-id="hf-i6ji" id="p-glass" class="grp">
+      <div data-hf-id="hf-3mvd" id="p-glass-body"></div>
+      <svg data-hf-id="hf-ij4z" style="inset:0;width:116px;height:76px" viewBox="0 0 116 76">
+        <path data-hf-id="hf-gno5" style="stroke:var(--glass-edge)" stroke-width="1" d="M 38 1 H 78 C 99 1 115 17 115 38 C 115 59 99 75 78 75 H 38 C 17 75 1 59 1 38 C 1 17 17 1 38 1 Z"/>
+        <path data-hf-id="hf-iva7" style="stroke:var(--glass-burgundy)" stroke-width="1.3" d="M 1 44 V 38 C 1 17 17 1 38 1 H 79"/>
+        <path data-hf-id="hf-kfkp" style="stroke:var(--glass-lavender)" stroke-width="1.5" d="M 79 1 C 93 1 103 7 110 20"/>
+        <path data-hf-id="hf-pbfg" style="stroke:var(--glass-rim)" stroke-width="2" d="M 2 45 C 5 65 20 75 38 75 H 79 C 94 75 106 67 112 54"/>
+      </svg>
+      <div data-hf-id="hf-4fwq" class="glint" style="left:25px;top:5px;width:55px;--a:47%"></div>
+      <div data-hf-id="hf-bhjy" class="glint" style="left:24px;top:64px;width:56px;height:8px;--a:80%"></div>
+    </div>
+    <div data-hf-id="hf-out4" id="p-refresh" class="btn">
+      <svg data-hf-id="hf-l5f7" style="width:43px;height:43px;stroke-width:2.2" viewBox="0 0 24 24"><path data-hf-id="hf-yfjx" d="M 21 8 A 9 9 0 1 0 20 18 M 21 1 V 8 H 14"/></svg>
+      <span data-hf-id="hf-m8jk" class="t" style="font:500 32px/48px var(--font-ui)" data-slot="button-secondary" data-fit="170">Plan</span>
+    </div>
+    <div data-hf-id="hf-qkks" id="p-share" class="btn"><span data-hf-id="hf-waau" class="t" style="font:500 32px/48px var(--font-ui)" data-slot="cta" data-fit="280">Apply</span></div>
+  </div>
+
+  <!-- popup filter menu (1.20–5.15 s): card grows from the "All" pill, rows slide in from the right -->
+  <div data-hf-id="hf-jedk" id="p-popup" class="grp">
+    <div data-hf-id="hf-d31w" id="p-psurf"></div>
+    <div data-hf-id="hf-w962" id="p-pclip">
+      <div data-hf-id="hf-583s" id="p-sweep"></div>
+      <div data-hf-id="hf-vf06" class="mrow" data-y="44"><svg data-hf-id="hf-ulu9" viewBox="0 0 24 24"><path data-hf-id="hf-w77m" d="M 22 12 C 22 -1 2 -1 2 12 C 2 15 3 18 4 19 L 2 22 L 8 21 C 15 24 22 19 22 12 Z"/></svg><span data-hf-id="hf-qxe2" class="t" data-slot="menu-all" data-fit="220">All</span>
+        <svg data-hf-id="hf-93ax" style="left:355px;top:9px;width:27px;height:27px" viewBox="0 0 24 24"><path data-hf-id="hf-ntdp" d="M 3 12 L 9 18 L 22 4"/></svg></div>
+      <div data-hf-id="hf-920e" class="mrow" data-y="138"><svg data-hf-id="hf-1tol" viewBox="0 0 24 24"><path data-hf-id="hf-p97q" d="M 22 12 C 22 -1 2 -1 2 12 C 2 15 3 18 4 19 L 2 22 L 8 21 C 15 24 22 19 22 12 Z"/></svg>
+        <div data-hf-id="hf-hn1j" class="circle" style="left:83.56px;top:34.56px;width:12.32px;height:12.32px;background:var(--ink)"></div><span data-hf-id="hf-7k9t" class="t" data-slot="menu-unread" data-fit="290">Unread</span></div>
+      <div data-hf-id="hf-v16z" class="mrow" data-y="232"><svg data-hf-id="hf-30lo" viewBox="0 0 24 24"><path data-hf-id="hf-xzql" d="M 12 2 A 4 4 0 1 1 12 10 A 4 4 0 1 1 12 2 M 3 22 C 3 10 21 10 21 22 Z"/></svg><span data-hf-id="hf-j5ma" class="t" data-slot="menu-direct" data-fit="290">Business</span></div>
+      <div data-hf-id="hf-cpnp" class="mrow" data-y="326"><svg data-hf-id="hf-2man" viewBox="0 0 24 24"><path data-hf-id="hf-741d" d="M 16 1 A 3.5 3.5 0 1 1 16 8 A 3.5 3.5 0 1 1 16 1 M 10 21 C 10 10 23 10 23 21 Z M 5 3 A 3 3 0 1 1 5 9 A 3 3 0 1 1 5 3 M 8 13 C 0 11 0 21 0 21 L 7 21"/></svg><span data-hf-id="hf-dbqx" class="t" data-slot="menu-groups" data-fit="290">Life</span></div>
+      <div data-hf-id="hf-3lui" class="mrow" data-y="431"><svg data-hf-id="hf-3t7q" viewBox="0 0 24 24"><path data-hf-id="hf-jkwp" d="M 22 11 C 21 0 7 -2 2 7 C 0 11 1 15 3 18 L 1 22 L 7 21 L 11 22"/></svg>
+        <svg data-hf-id="hf-oaqh" style="left:57.6px;top:8.6px;stroke-width:2.5" viewBox="0 0 24 24"><path data-hf-id="hf-ewv1" d="M 23 16 H 14 M 18 11 L 13 16 L 18 21"/></svg><span data-hf-id="hf-cfxf" class="t" data-slot="menu-requests" data-fit="290">Requests</span></div>
+      <div data-hf-id="hf-4mw1" class="mrow" id="p-new-row"><div data-hf-id="hf-22py" id="p-keypad" style="left:51px;top:2px;width:44px;height:44px"><img data-hf-id="hf-4a3a" src="assets/brand/exo-orb.png" alt="Exo orb" style="left:0;top:0;width:44px;height:44px"></div><span data-hf-id="hf-zby0" class="t" id="p-typed" data-slot="menu-new-item" data-fit="290">Exo</span></div>
+      <div data-hf-id="hf-u8l2" class="mrow push" data-y="532"><svg data-hf-id="hf-3ewp" viewBox="0 0 24 24"><path data-hf-id="hf-1wvb" d="M 9 1 L 14 1 L 16 4 L 20 5 L 20 9 L 23 12 L 20 15 L 20 19 L 16 20 L 14 23 L 9 23 L 7 20 L 3 19 L 3 15 L 1 12 L 3 9 L 3 5 L 7 4 Z M 16 12 A 4 4 0 1 1 8 12 A 4 4 0 1 1 16 12"/></svg><span data-hf-id="hf-hdbt" class="t" data-slot="menu-settings" data-fit="290">Settings</span></div>
+      <div data-hf-id="hf-r51b" class="mrow push" data-y="652"><svg data-hf-id="hf-4lts" viewBox="0 0 24 24"><path data-hf-id="hf-lynx" d="M 1 3 H 13 M 1 8 H 8 M 6 15 L 12 20 L 23 5"/></svg><span data-hf-id="hf-g8gh" class="t" data-slot="menu-mark-read" data-fit="290">Mark All Read</span></div>
+      <div data-hf-id="hf-obq5" class="mdiv" style="top:400px"></div>
+      <div data-hf-id="hf-140g" class="mdiv push" data-y="613" style="top:0"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+<script>
+(() => {
+
+// Remixable values. Times are seconds from the scene start (source frame / 60).
+const PARAMS = {
+  typeOn: { from: 3.367, to: 3.583 },  // new menu item: first / last grapheme appears (graphemes in between spread evenly)
+  reelStartDigit: 0,                  // every odometer column starts on this digit, then rolls to the slot digit
+  reelPitch: 60,                      // px between odometer columns (sheet units); shrinks for long numbers
+  pillPitch: 108.9,                   // px between glyphs of the opening pill number
+  dialStep: { left: -4.3, right: 4.7 },  // degrees between dial glyphs (left arc runs anticlockwise)
+};
+
+// Measured motion (motion.md): "t→v" pairs, linear between; a repeated t is a hard step.
+const M = {
+  dialX: '0→1482 0.067→1276 0.200→676 0.267→460 0.333→318 0.400→211 0.467→137 0.533→102 0.667→80 1.000→95 2.000→75 2.867→30',
+  dialY: '0→407 0.067→428 0.133→411 0.200→386 0.267→327 0.333→280 0.400→244 0.467→219 0.533→207 0.667→200 1.000→215 2.000→175 2.867→110',
+  dialS: '0→0.382 0.067→0.482 0.133→0.636 0.200→0.739 0.267→0.83 0.333→0.893 0.400→0.943 0.467→0.976 0.533→0.992 0.667→1.0 2.000→1.0 2.867→1.06',
+  rotor: '0→-8 0.667→0',   // turns while the dial sweeps in, then holds
+  node0: '0→943 0.667→813 2.5→670',
+  node1: '0→1042 0.667→1142 2.5→1220',
+  phoneX: '0.233→500 1.800→500 1.867→486 2.000→473 2.133→443 2.267→399 2.400→334 2.533→240 2.667→130 2.867→-150 2.900→-150 2.900→638 7.450→638',
+  phoneY: '0.233→1230 0.267→970 0.333→663 0.400→465 0.467→347 0.533→268 0.600→218 0.667→180 0.733→153 0.800→136 0.867→125 0.933→119 1.000→118 1.800→118 2.000→111 2.133→102 2.267→87 2.400→54 2.533→-15 2.667→-120 2.867→-390 2.900→-390 2.900→-962.2 ' +
+    '4.167→-962.2 4.600→-762.2 4.667→-702.2 4.733→-658.2 4.800→-632.2 4.867→-584.2 4.933→-552.2 5.000→-526.2 5.067→-509.2 5.133→-493.2 5.200→-481.2 5.267→-473.2 5.333→-464.2 5.400→-456.2 5.467→-449.2 5.600→-439.2 5.667→-436.2 5.733→-432.2 5.867→-429.2 6.000→-428.2 7.200→-428.2 7.400→-467.2 7.450→-497.2',
+  phoneS: '0.233→1 1.800→1 1.867→1.015 2.000→1.026 2.133→1.049 2.267→1.092 2.400→1.157 2.533→1.25 2.667→1.36 2.867→1.5 2.900→1.5 2.900→0.702 7.450→0.702',
+  rowsY: '0→0 1.000→0 1.600→-12 2.900→-12 2.900→0',
+  diskX: '2.133→900 2.200→860 2.267→805 2.333→718 2.400→597 2.467→454 2.533→305 2.600→180 2.667→64 2.800→-340',
+  diskY: '2.133→320 2.200→280 2.267→225 2.333→142 2.400→28 2.533→-250 2.600→-370 2.667→-476 2.800→-880',
+  diskD: '2.133→460 2.200→540 2.267→650 2.333→812 2.400→1030 2.467→1292 2.533→1560 2.600→1780 2.667→1992 2.800→2800',
+  popX: '1.200→916 1.667→914 2.000→906 2.133→889 2.267→860 2.400→817 2.533→763 2.667→700 2.733→671 2.800→644 2.867→624 2.933→608 3.000→594 3.067→584 3.133→576 3.200→569 3.267→565 3.333→560 3.600→548 3.667→546 3.800→544',
+  popY: '1.200→287 1.667→289 2.000→289 2.133→287.5 2.267→277.2 2.400→248.6 2.533→198.9 2.667→105.9 2.733→52.6 2.800→-8.3 2.933→-121.1 3.000→-173.6 3.067→-212.9 3.133→-306.4 3.200→-397.8 3.267→-450.7 3.333→-500.5 3.467→-538.9 3.533→-556.1 3.600→-574.3 3.667→-585.8 3.800→-602.1 3.933→-609.8 ' +
+    '4.133→-609.8 4.200→-611.8 4.267→-615.8 4.333→-624.8 4.400→-639.8 4.467→-655.8 4.533→-679.8 4.600→-711.8 4.667→-749.8 4.733→-799.8 4.800→-866.8 4.867→-951.8 4.933→-1071.8 5.000→-1243.8 5.067→-1503.8 5.133→-1869.8',
+  popS: '1.200→1 2.000→1 2.133→1.018 2.267→1.059 2.400→1.12 2.533→1.202 2.667→1.318 2.800→1.461 2.933→1.586 3.000→1.641 3.200→1.759 3.333→1.79 3.600→1.815 3.800→1.825 3.933→1.83',
+  cardW: '1.200→142 1.267→148 1.333→156 1.400→173 1.467→202 1.533→248 1.600→308 1.667→357 1.733→391 1.800→413 1.867→426 1.933→434 2.000→440',
+  cardH: '1.200→82 1.267→91 1.333→112 1.400→153 1.467→219 1.533→324 1.600→454 1.667→563 1.733→636 1.800→684 1.867→716 1.933→730 2.000→742 3.067→742 3.200→806 3.333→836',
+  newRowY: '3.200→496 3.267→513 3.367→525',
+  newRowX: '3.200→110 3.217→70 3.267→53 3.333→36 3.400→23 3.467→14 3.533→6 3.600→1 3.667→0',
+  typedX: '3.200→16 3.367→16 3.583→0',
+  push: '1.200→0 3.067→0 3.200→64 3.333→94',   // Settings, Mark All Read and the lower divider make room
+  sweepX: '3.867→-900 4.000→-690 4.133→-580 4.200→-480 4.267→-350 4.333→-160 4.400→5 4.533→350 4.617→500',
+  sheetX: '2.900→720 4.600→720 4.600→670 5.133→670 5.200→669 5.267→666 5.333→662 5.400→657 5.467→650 5.533→639 5.600→629 5.667→621 5.733→615 5.867→607 5.933→604 6.000→602 6.067→599 6.200→595 6.400→591 6.533→589 6.667→588 7.000→587',
+  sheetY: '2.900→480 4.600→480 4.600→40 4.667→95 4.733→140 4.800→165 4.867→179 4.933→212 5.000→238 5.133→270 5.200→281 5.267→287 5.333→288 5.400→283 5.467→272 5.533→255 5.600→242 5.667→230 5.733→222 5.800→216 6.000→200 6.067→197 6.133→193 6.200→190 6.400→183 6.533→179 6.667→177 7.000→175 7.200→175 7.400→216 7.450→245',
+  sheetSX: '2.900→0.5 4.600→0.5 4.600→0.777 5.133→0.777 5.267→0.788 5.400→0.813 5.467→0.832 5.600→0.888 5.733→0.924 5.933→0.955 6.200→0.985 6.400→1.0 7.450→1.0',
+  sheetSY: '2.900→0.5 4.600→0.5 4.600→0.778 5.133→0.775 5.267→0.788 5.400→0.812 5.533→0.869 5.667→0.916 5.800→0.941 6.067→0.975 6.300→1.0 7.450→1.0',
+  // odometer progress shared by every column (0 = start digit, 1 = slot digit); slight overshoot then settle
+  reel: '5.233→0 5.300→0.014 5.367→0.035 5.400→0.065 5.467→0.125 5.533→0.23 5.600→0.38 5.667→0.56 5.733→0.714 5.783→0.826 5.833→0.863 5.883→0.926 5.933→0.951 5.983→0.985 6.033→0.995 6.083→1.008 6.133→1.013 6.183→1.017 6.233→1.014 6.333→1.012 6.433→1.005 6.533→1.001 7.000→1',
+  share: '4.600→1 6.733→1 6.867→0.978 6.933→0.936 7.000→0.885 7.100→0.95 7.200→1 7.400→1.037 7.450→1.029',
+  ending: '7.333→0.02 7.400→0.4815 7.450→1',
+};
+// Liquid-glass toggle: 2-frame stepped poses [t, x, y, w, h, thumb opacity, glass scaleX, glass scaleY, glass opacity]
+const TOGGLE = [
+  [6.600, 560, 465, 86, 60, 0.3, 0.741, 0.789, 0.7],
+  [6.633, 547, 459, 112, 72, 0, 0.966, 0.947, 1],
+  [6.667, 545, 457, 116, 76, 0, 1, 1, 1],
+  [6.767, 556, 460, 108, 71, 0, 0.931, 0.934, 0.8],
+  [6.800, 571, 463, 101, 64, 0.6, 0.871, 0.842, 0.5],
+  [6.833, 584, 467, 91, 57, 0.84, 0.784, 0.75, 0.25],
+  [6.867, 599, 470, 80, 51, 0.91, 0.69, 0.671, 0.12],
+  [6.900, 604, 471, 76, 49, 1, 0.655, 0.645, 0.12],
+  [6.933, 610, 471, 71, 49, 1, 0.612, 0.645, 0],
+  [6.967, 610, 472, 71, 47, 1, 0.612, 0.645, 0],
+];
+const TRACK_ON = [[6.800, 0.24], [6.833, 0.32], [6.867, 0.46], [6.900, 0.6], [6.933, 0.72], [7.000, 0.85], [7.200, 1]]; // green share of the track
+
+const FPS = 60;
+const fr = t => Math.round(t * FPS);   // seconds → source frame
+const S = f => (f - 0.5) / FPS;        // switch point just before frame f
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const K = str => str.trim().split(/\s+/).map(p => p.split('→').map(Number));
+
+window.__timelines = window.__timelines || {};
+const tl = gsap.timeline({ paused: true });
+window.__timelines["proof"] = tl;
+
+// one measured curve → keyframes tween (ease none); a repeated time becomes a hard step half a frame early
+function track(el, prop, keys, map = v => v) {
+  if (typeof keys === 'string') keys = K(keys);
+  const f = keys.map(k => fr(k[0])), t = f.map(x => x / FPS);
+  f.forEach((x, i) => { if (i && x === f[i - 1]) t[i - 1] = S(x); });
+  tl.set(el, { [prop]: map(keys[0][1]) }, 0);
+  if (keys.length < 2) return;
+  tl.to(el, { keyframes: keys.slice(1).map((k, i) => ({ [prop]: map(k[1]), duration: t[i + 1] - t[i], ease: 'none' })) }, t[0]);
+}
+function steps(el, prop, list) { list.forEach(([t, v]) => tl.set(el, { [prop]: v }, S(fr(t)))); }
+function show(el, f0, f1) {
+  tl.set(el, { visibility: f0 > 0 ? 'hidden' : 'visible' }, 0);
+  if (f0 > 0) tl.set(el, { visibility: 'visible' }, S(f0));
+  if (f1 != null) tl.set(el, { visibility: 'hidden' }, S(f1));
+}
+// split a slot's text into one absolutely placed span per non-space glyph
+function glyphs(el) {
+  const chars = Array.from(el.textContent).filter(c => c.trim());
+  el.textContent = '';
+  return chars.map(c => { const s = document.createElement('span'); s.textContent = c; el.appendChild(s); return s; });
+}
+// glyphs around the dial: radius 810 about the dial centre, upright to the circle, fixed angular step
+function arc(el, a0, step) {
+  glyphs(el).forEach((s, i) => {
+    const a = a0 + i * step, r = a * Math.PI / 180;
+    Object.assign(s.style, { left: 880 + 810 * Math.sin(r) - 20 + 'px', top: 880 - 810 * Math.cos(r) - 22 + 'px', transform: `rotate(${a}deg)` });
+  });
+}
+// typeOn: graphemes of a slot appear one by one between t0 and t1 (first at t0, all by t1)
+function typeOn(el, t0, t1) {
+  const g = Array.from(el.textContent); el.textContent = '';
+  g.forEach((c, i) => {
+    const s = document.createElement('span'); s.textContent = c; s.style.position = 'static'; el.appendChild(s);
+    const on = g.length > 1 ? fr(t0) + Math.round(i * (fr(t1) - fr(t0)) / (g.length - 1)) : fr(t0);
+    tl.set(s, { visibility: 'hidden' }, 0); tl.set(s, { visibility: 'visible' }, S(on));
+  });
+}
+// odometer: one masked column per digit; columns alternate direction by character position (even = rolls down);
+// a column rolls from PARAMS.reelStartDigit through the shared progress curve; other characters stay fixed
+function odometer(slot) {
+  const chars = Array.from(slot.textContent.replace(/\s/g, '')), box = slot.parentNode;
+  const pitch = Math.min(PARAMS.reelPitch, 640 / chars.length), cx = 376;
+  chars.forEach((c, i) => {
+    const left = cx + (i - (chars.length - 1) / 2) * pitch - 25;
+    if (!/\d/.test(c)) {
+      const s = document.createElement('span'); s.className = 'fixed'; s.textContent = c;
+      Object.assign(s.style, { left: left + 'px', top: '11px' }); box.appendChild(s);
+      track(s, 'opacity', '5.333→0.22 5.467→1'); return;
+    }
+    const down = i % 2 === 0, d = +c, d0 = PARAMS.reelStartDigit;
+    const n = (down ? (d0 - d + 10) % 10 : (d - d0 + 10) % 10) || 10;
+    const reel = document.createElement('div'); reel.className = 'reel'; reel.style.left = left + 'px';
+    const strip = document.createElement('div'); strip.className = 'strip';
+    for (let j = -1; j <= n + 1; j++) {
+      const s = document.createElement('span'); s.textContent = ((d0 + (down ? -j : j)) % 10 + 10) % 10;
+      s.style.top = 11 + (down ? -55 : 55) * j + 'px'; strip.appendChild(s);
+    }
+    reel.appendChild(strip); box.appendChild(reel);
+    track(strip, 'y', M.reel, p => (down ? 55 : -55) * n * p);
+    track(strip, 'opacity', '5.300→0.22 5.400→1');
+  });
+}
+
+// ---- build ----
+// fixed text boxes: a longer remix string shrinks its font until it fits data-fit px (measured once at load)
+function fitText() {
+  const m = document.createElement('span');   // untransformed measurer: offsetWidth ignores every parent scale
+  Object.assign(m.style, { position: 'absolute', visibility: 'hidden', whiteSpace: 'pre', left: '0', top: '0' });
+  document.body.appendChild(m);
+  $$('[data-fit]').forEach(el => {
+    el.style.fontSize = ''; m.style.font = getComputedStyle(el).font; m.textContent = el.textContent;
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    while (m.offsetWidth > +el.dataset.fit && size > 8) { size -= 1; m.style.fontSize = size + 'px'; }
+    if (size !== parseFloat(getComputedStyle(el).fontSize)) el.style.fontSize = size + 'px';
+  });
+  m.remove();
+}
+// the copy is sized to fit its boxes; no runtime shrinking
+for (const y of [280, 800]) for (let x = -10; x < 1930; x += 84) {
+  const d = document.createElement('div'); d.className = 'dash'; Object.assign(d.style, { left: x + 'px', top: y + 'px' }); $('#p-dashes').appendChild(d);
+}
+{ const g = glyphs($('#p-pill-number')), p = Math.min(PARAMS.pillPitch, 1100 / g.length);
+  g.forEach((s, i) => Object.assign(s.style, { left: 570 + (i - (g.length - 1) / 2) * p - 45 + 'px', width: '90px' })); }
+arc($('#p-arc-left'), -41, PARAMS.dialStep.left);
+arc($('#p-arc-right'), 38, PARAMS.dialStep.right);
+
+// ---- timeline ----
+tl.addLabel('s01-open', 0);
+// S01 · 0.00–0.50 · number pill and dashed rules, swallowed by the dial expanding from lower right
+show($('#p-dashes'), 0, 22); show($('#p-node0'), 0, 22); show($('#p-node1'), 0, 22); show($('#p-left-ring'), 0, 22);
+track($('#p-node0'), 'x', M.node0); track($('#p-node1'), 'x', M.node1);
+show($('#p-pill'), 0, 30);
+show($('#p-dial'), 0, 180);
+track($('#p-dial'), 'x', M.dialX); track($('#p-dial'), 'y', M.dialY); track($('#p-dial'), 'scale', M.dialS);
+track($('#p-rotor'), 'rotation', M.rotor);
+
+tl.addLabel('s01-phone-rise', 0.233);
+// S01 · 0.23–1.00 · phone rises from below with a strong ease-out, no overshoot
+show($('#p-phone'), 14);
+track($('#p-phone'), 'x', M.phoneX); track($('#p-phone'), 'y', M.phoneY); track($('#p-phone'), 'scale', M.phoneS);
+track($('#p-rows'), 'y', M.rowsY);
+show($('#p-all-btn'), 14, 72);
+
+tl.addLabel('s01-menu-open', 1.2);
+// S01 · 1.20–2.13 · menu card grows left/down from the All pill; rows slide in from the right, staggered by index
+show($('#p-popup'), 72, 309);
+track($('#p-popup'), 'x', M.popX); track($('#p-popup'), 'y', M.popY); track($('#p-popup'), 'scale', M.popS);
+track($('#p-popup'), '--pw', M.cardW); track($('#p-popup'), '--ph', M.cardH);
+$$('#p-pclip .mrow[data-y]').forEach((r, k) => {
+  tl.set(r, { y: +r.dataset.y }, 0);
+  track(r, 'x', [[1.2, 400], [1.4, 365], [1.533, 230 + 26 * k], [1.667, 97 + 26 * k], [1.8, 22 + 20 * k], [2.0, 4 + 4 * k], [2.133, 0]]);
+});
+
+tl.addLabel('s01-isolate', 2.133);
+// S01 · 2.13–2.87 · pale disk grows between phone and menu; phone pushes left/bigger, menu enlarges (camera push)
+show($('#p-disk'), 128, 276);
+track($('#p-disk'), 'left', M.diskX); track($('#p-disk'), 'top', M.diskY);
+track($('#p-disk'), 'width', M.diskD); track($('#p-disk'), 'height', M.diskD);
+
+tl.addLabel('s01-new-row', 3.067);
+// S01 · 3.07–3.67 · lower rows push down; new row enters from the right, keypad icon first (3.20)
+$$('#p-pclip .push').forEach(r => track(r, 'y', M.push, v => +r.dataset.y + v));
+show($('#p-new-row'), 192, 309);
+track($('#p-new-row'), 'y', M.newRowY); track($('#p-new-row'), 'x', M.newRowX);
+track($('#p-typed'), 'x', M.typedX);
+tl.addLabel('s01-type', PARAMS.typeOn.from);
+// S01 · 3.37–3.58 · item label types on, one grapheme at a time
+typeOn($('#p-typed'), PARAMS.typeOn.from, PARAMS.typeOn.to);
+
+tl.addLabel('s01-select', 3.867);
+// S01 · 3.87–4.62 · soft grey band sweeps left→right through the new row
+show($('#p-sweep'), 232, 278);
+track($('#p-sweep'), 'x', M.sweepX);
+
+tl.addLabel('s01-menu-exit', 4.133);
+// S01 · 4.13–5.15 · menu accelerates up and away, uncovering the small phone and the sheet (phone steps to late view at 4.17)
+track($('#p-scrim'), 'opacity', '0→0 2.900→0 2.900→0.2');
+show($('#p-sheet'), 174);   // mounted under the menu card at 2.9 s, revealed as the menu flies off
+track($('#p-sheet'), 'x', M.sheetX); track($('#p-sheet'), 'y', M.sheetY);
+track($('#p-sheet'), 'scaleX', M.sheetSX); track($('#p-sheet'), 'scaleY', M.sheetSY);
+
+// the sheet's copy wakes as the menu clears it
+tl.fromTo(['#p-sheet > span.t', '#p-refresh span', '#p-share span'], { opacity: 0 }, { opacity: 1, duration: 0.15, ease: 'none' }, 5.15);
+tl.addLabel('s01-reels', 5.233);
+// S01 · 5.23–6.53 · sheet grows past the phone; odometer columns roll in alternating directions and settle
+odometer($('#p-number-final'));
+
+tl.addLabel('s01-toggle', 6.6);
+// S01 · 6.60–7.20 · toggle thumb swells into a glass bulge, slides right in 2-frame steps, track turns green
+show($('#p-glass'), 396, 418);
+tl.set($('#p-thumb'), { x: 567, y: 472 }, 0);
+tl.set($('#p-glass'), { x: 545, y: 457 }, 0);
+TOGGLE.forEach(([t, x, y, w, h, o, sx, sy, go]) => {
+  tl.set($('#p-thumb'), { x, y, width: w, height: h, opacity: o }, S(fr(t)));
+  tl.set($('#p-glass'), { x, y, scaleX: sx, scaleY: sy, opacity: go }, S(fr(t)));
+});
+steps($('#p-track-on'), 'opacity', TRACK_ON);
+tl.addLabel('s01-share-pulse', 6.733);
+// S01 · 6.73–7.45 · Share button squeezes and rebounds about its centre
+track($('#p-share'), 'scale', M.share);
+
+tl.addLabel('s01-handoff', 7.2);
+// S01 · 7.20–7.47 · sheet slides down, phone up; a small double circle grows at frame centre
+tl.set({}, {}, 7.467);
+
+})();
+</script>
+</template>

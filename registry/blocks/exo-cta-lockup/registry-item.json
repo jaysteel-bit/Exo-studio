@@ -1,0 +1,47 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry-item.json",
+  "name": "exo-cta-lockup",
+  "type": "hyperframes:block",
+  "title": "Exo CTA lockup",
+  "description": "Closing beat (6.3 s). Goal or experience, one Exo, then the Apply call to action with the orb lockup.",
+  "stability": "experimental",
+  "dimensions": {
+    "width": 1920,
+    "height": 1080
+  },
+  "duration": 6.3,
+  "tags": [
+    "exo",
+    "cta",
+    "lockup",
+    "brand"
+  ],
+  "files": [
+    {
+      "path": "exo-cta-lockup.html",
+      "target": "compositions/exo-cta-lockup.html",
+      "type": "hyperframes:composition"
+    },
+    {
+      "path": "assets/brand/exo-orb.png",
+      "target": "assets/brand/exo-orb.png",
+      "type": "hyperframes:asset"
+    },
+    {
+      "path": "assets/brand/icon-experience.svg",
+      "target": "assets/brand/icon-experience.svg",
+      "type": "hyperframes:asset"
+    },
+    {
+      "path": "assets/brand/icon-goal.svg",
+      "target": "assets/brand/icon-goal.svg",
+      "type": "hyperframes:asset"
+    }
+  ],
+  "x-exo": {
+    "from": "2026-10-26__exo-launch__product-film (launch film, New video)",
+    "projectAssets": [
+      "assets/fonts/GoogleSans.ttf"
+    ]
+  }
+}

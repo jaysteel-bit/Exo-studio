@@ -1,0 +1,23 @@
+{
+  "$schema": "https://hyperframes.heygen.com/schema/registry.json",
+  "name": "exo-studio",
+  "homepage": "https://github.com/jaysteel-bit/Exo-studio",
+  "items": [
+    {
+      "name": "exo-hook-hero-reveal",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "exo-proof-inbox-sheet",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "exo-turn-go-further",
+      "type": "hyperframes:block"
+    },
+    {
+      "name": "exo-cta-lockup",
+      "type": "hyperframes:block"
+    }
+  ]
+}

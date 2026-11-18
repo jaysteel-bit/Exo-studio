@@ -1,0 +1,286 @@
+{
+  "storyboard": false,
+  "approved": "2026-10-26T16:40:00Z",
+  "intent": "transplant",
+  "angle": "C · Two Lives, One Partner: the ambition is yours (life), Exo joins your business and life inbox, go further, one Exo for a goal to build or an experience to shape",
+  "channel": "X / LinkedIn, 16:9",
+  "brand": "Exo",
+  "feature": {
+    "name": "Exo Membership",
+    "shipped": "Exo is your Master Operating Partner across business and life",
+    "one_thing": "You keep the ambition and the final say; Exo carries the rest",
+    "viewer": "founders, investors and executives",
+    "task": "add one partner to everything you run, then approve the work weekly",
+    "before": "every priority, business and personal, runs hot through you",
+    "after": "one partner curates and coordinates while you retain the decisions",
+    "cta": "Apply for Exo Membership"
+  },
+  "voice": "silent",
+  "music": "assets/music/exo-bed.wav (HeyGen library track; no HeyGen key for a generated one)",
+  "duration": 21.401,
+  "ratio": "16:9",
+  "ground": "#F5F5F0",
+  "ink": "#070906",
+  "accent": "#10B981",
+  "fonts": {
+    "display": "assets/fonts/GoogleSans.ttf",
+    "body": "assets/fonts/GoogleSans.ttf"
+  },
+  "brandReveal": "cta",
+  "beats": [
+    {
+      "id": "hook",
+      "start": 0,
+      "end": 3.6,
+      "line": "The ambition is yours",
+      "picture": "Exo's hero photo of a runner burns in false-colour heat, clears surface by surface to the real golden-hour run, the line steps in",
+      "route": "thermal scan clears per surface, hard cut to a closer framing",
+      "ui": [],
+      "vo": null,
+      "assets": [
+        {
+          "what": "hero photo (clairty-runner) from the page",
+          "bucket": "capture",
+          "have": true
+        },
+        {
+          "what": "generated terrace dinner plates (wide + medium)",
+          "bucket": "generate",
+          "have": false
+        }
+      ],
+      "shots": [
+        {
+          "at": 0.6,
+          "screen": "the runner's silhouette and the rocks glow violet-orange on a pale scan ground",
+          "motion": "surfaces heat in one by one, runner first"
+        },
+        {
+          "at": 1.6,
+          "screen": "heat clears off the runner first, the line 'The ambition is yours' steps in on the left",
+          "motion": "per-surface clear, 3-frame stepped title, slow pull-back"
+        },
+        {
+          "at": 3.0,
+          "screen": "closer framing of the runner, line held",
+          "motion": "hard cut with one-frame scale snap, slow linear push-in"
+        }
+      ],
+      "seam": "hard-cut",
+      "exit": {
+        "axis": "z",
+        "dir": 1
+      },
+      "entry": {
+        "axis": "z",
+        "dir": 1
+      },
+      "moment": "M1115",
+      "port": "M1115: SURFACES + drawThermal, #footage drift tracks, #wide-screen opacity steps (as the title), #medium-camera cut 0–3.6 s",
+      "borrow": [
+        "M1115@0.0–0.72",
+        "M1115@1.04–2.24",
+        "M1115@1.28–1.40",
+        "M1115@2.24–3.56"
+      ],
+      "keep": [
+        {
+          "check": "hard cuts",
+          "finding": "M1115@2.24–3.56"
+        }
+      ],
+      "carrier": "the runner"
+    },
+    {
+      "id": "proof",
+      "start": 3.6,
+      "end": 11.067,
+      "line": "One partner for business and life",
+      "picture": "a phone inbox of business and family threads; the filter menu opens, a new row 'Exo' types in, the Exo Membership sheet rolls its weekly 30:00 review and 'You retain the decisions' switches on",
+      "route": "menu grows from the All pill, disk isolates it, new row types on, sheet with odometer",
+      "ui": [
+        "All pill → filter menu grows out of it",
+        "rows make room → 'Exo' row slides in with the orb icon and types on",
+        "row selected → menu flies up, the Exo Membership sheet grows",
+        "sheet → 30:00 odometer rolls, toggle turns on, Apply pulses"
+      ],
+      "vo": null,
+      "assets": [
+        {
+          "what": "page copy: weekly 30-minute review, You retain the decisions, Apply",
+          "bucket": "capture",
+          "have": true
+        },
+        {
+          "what": "phone, inbox, menu and sheet rebuilt from M1174",
+          "bucket": "build",
+          "have": true
+        }
+      ],
+      "shots": [
+        {
+          "at": 0.9,
+          "screen": "the 30:00 pill swallowed by the dial, the phone rises with the inbox",
+          "motion": "dial sweep, strong ease-out rise"
+        },
+        {
+          "at": 3.6,
+          "screen": "the menu fills the frame, 'Exo' row typing on",
+          "motion": "camera push, isolation disk"
+        },
+        {
+          "at": 6.6,
+          "screen": "Exo Membership sheet: One partner for business and life, 30:00, You retain the decisions",
+          "motion": "odometer settles, glass toggle turns green"
+        }
+      ],
+      "seam": "cut-while-moving",
+      "exit": {
+        "axis": "y",
+        "dir": 1
+      },
+      "entry": {
+        "axis": "y",
+        "dir": 1
+      },
+      "moment": "M1174",
+      "port": "M1174: whole S01 timeline 0–7.467 s (M tracks, TOGGLE, odometer, typeOn), hand-off circle dropped",
+      "borrow": [
+        "M1174@1.20–2.13",
+        "M1174@2.13–2.80",
+        "M1174@3.37–3.58",
+        "M1174@5.23–6.53",
+        "M1174@6.60–7.20"
+      ],
+      "keep": [
+        {
+          "check": "no jitter",
+          "finding": "M1174@5.23–6.53"
+        },
+        {
+          "check": "no jitter",
+          "finding": "M1174@2.13–2.80"
+        }
+      ],
+      "carrier": "the orb, now a menu row"
+    },
+    {
+      "id": "turn",
+      "start": 11.067,
+      "end": 15.101,
+      "line": "Go further",
+      "picture": "'Go further' floats over the runner photo laid as a perspective plate; the camera punches through it into a giant gliding 'Exo'",
+      "route": "slow push, accelerating knee, punch-through, hard cut to the giant word",
+      "ui": [],
+      "vo": null,
+      "assets": [
+        {
+          "what": "hero photo as the plate texture",
+          "bucket": "capture",
+          "have": true
+        }
+      ],
+      "shots": [
+        {
+          "at": 1.2,
+          "screen": "Go further over the runner plate",
+          "motion": "slow push"
+        },
+        {
+          "at": 2.7,
+          "screen": "headline at 2.5x leaving the top",
+          "motion": "punch zoom"
+        },
+        {
+          "at": 3.5,
+          "screen": "giant Exo gliding left, spectrum wash inside the letters",
+          "motion": "blurred entry, 7-frame focus pull, glide"
+        }
+      ],
+      "seam": "cut-while-moving",
+      "exit": {
+        "axis": "x",
+        "dir": -1
+      },
+      "entry": {
+        "axis": "x",
+        "dir": -1
+      },
+      "moment": "M1140",
+      "port": "M1140: whole S01 (MOTION tracks, headline core/trail, wordmark fills) 0–4.034 s, stage scaled 0.75",
+      "borrow": [
+        "M1140@0.0–2.07",
+        "M1140@2.07–2.80",
+        "M1140@2.83–4.03"
+      ],
+      "keep": [
+        {
+          "check": "hard cuts",
+          "finding": "M1140@2.83–4.03"
+        }
+      ],
+      "carrier": "the word Exo"
+    },
+    {
+      "id": "cta",
+      "start": 15.101,
+      "end": 21.401,
+      "line": "Apply for Exo Membership",
+      "picture": "a paper diagram: a badge flips from 'A goal to build' to 'An experience to shape', the link relinks to the Exo orb, a stair wipe, the orb fills and 'Exo' resolves, then the Apply pill",
+      "route": "carousel, relink, stair wipe, pixel-resolve lockup",
+      "ui": [],
+      "vo": null,
+      "assets": [
+        {
+          "what": "Exo orb (cut from exo-orb.jpg)",
+          "bucket": "shared",
+          "have": true
+        },
+        {
+          "what": "page copy: A goal to build / An experience to shape / Apply for Exo Membership",
+          "bucket": "capture",
+          "have": true
+        }
+      ],
+      "shots": [
+        {
+          "at": 1.0,
+          "screen": "badge mid-carousel, connector broken",
+          "motion": "stepped carousel with holds"
+        },
+        {
+          "at": 2.0,
+          "screen": "white stair wipe, diagram jerks left",
+          "motion": "wipe + translation"
+        },
+        {
+          "at": 4.0,
+          "screen": "orb + Exo lockup, Apply for Exo Membership pill",
+          "motion": "held"
+        }
+      ],
+      "seam": "end",
+      "exit": {
+        "axis": "z",
+        "dir": 0
+      },
+      "entry": {
+        "axis": "x",
+        "dir": -1
+      },
+      "moment": "M946",
+      "port": "M946: whole S01 (HORN frames, carousel tracks, link tracks, world exit, lockup resolve) 0–6.434 s, + Apply pill",
+      "borrow": [
+        "M946@0.70–1.80",
+        "M946@0.60–1.40",
+        "M946@1.80–2.77"
+      ],
+      "keep": [],
+      "carrier": "the orb"
+    }
+  ],
+  "notes": [
+    "No HeyGen API key was saved, so the generated terrace plates for storyline C could not be made; the hook uses Exo's own hero photo until a key is added.",
+    "Music: generated (Lyria) needs the key too; a HeyGen library track is used."
+  ]
+}

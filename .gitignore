@@ -1,0 +1,13 @@
+# HyperFrames output and caches, per project
+*/renders/
+*/.thumbnails/
+*/.waveform-cache/
+*/.hyperframes/
+node_modules/
+
+# Brand fonts are copied into each project from brand/ (scripts/sync-brand.mjs)
+*/assets/fonts/
+
+# This repo is public: licensed or third-party media stays on the machine.
+# Put it in a project's assets/local/ (music beds, stock or client photos, footage).
+*/assets/local/
