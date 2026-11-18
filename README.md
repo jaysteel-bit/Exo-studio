@@ -1,5 +1,8 @@
 # Exo-studio
 
+> [!NOTE]
+> This version is in the infancy stage. Update as needed.
+
 Exo's HyperFrames home: the Exo block registry, brand files, a project template, and the Exo video projects themselves. Videos are HTML compositions ([HyperFrames](https://github.com/heygen-com/hyperframes), Apache-2.0), so every project here can be edited, diffed and rendered without any one app.
 
 **Clone it to `~/Desktop/exo-studio`.** Flow OS → Exo Launch → Launch Studio lists the projects in that folder (and in `~/.hyperframes-studio`, where the HyperFrames app creates them). The **Exo editor** side of Launch Studio opens any of them; the **HyperFrames app** side is HeyGen's desktop app docked in the pane.
